@@ -1,0 +1,35 @@
+version: "3.1"
+services:
+  server:
+    image: ws_server
+    restart: always
+    container_name: ws_server
+    build:
+      context: .
+      dockerfile: Dockerfile-ws
+      args:
+        MYSQL_PASSWORD: foobar
+    depends_on:
+      - mysql
+    expose: 
+      - 3000
+    ports:
+      - 3000:3000
+  mysql:
+    image: mysql:5.7.32
+    platform: linux/x86_64
+    container_name: ws_mysql
+    command: --default-authentication-plugin=mysql_native_password
+    volumes:
+      - ./init-db/dbtemplate.sql:/docker-entrypoint-initdb.d/1.sql
+      - ws_db:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: foobar
+      MYSQL_DATABASE: ws_orderinfo
+      MYSQL_HOST: ws_mysql
+      MYSQL_ROOT_HOST: '%'
+    expose:
+      - 3306
+volumes:
+  ws_db:
+    external: true
