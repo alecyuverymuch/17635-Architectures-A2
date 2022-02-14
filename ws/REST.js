@@ -25,7 +25,7 @@
 *
 ******************************************************************************************************************/
 
-var mysql   = require("mysql");     //Database
+var mysql = require("mysql");     //Database
 
 function REST_ROUTER(router,connection) {
     var self = this;
@@ -101,6 +101,23 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection) {
         });
     });
 
+    // DELETE for /orders/order id specifier - deletes the order for the provided order ID
+    // req paramdter is the request object
+    // res parameter is the response object
+
+    router.delete("/orders/:order_id",function(req,res){
+        console.log("Deleting order ID: ", req.params.order_id);
+        var query = "DELETE FROM ?? WHERE ??=?";
+        var table = ["orders","order_id",req.params.order_id];
+        query = mysql.format(query,table);
+        connection.query(query,function(err,rows){
+            if(err) {
+                res.json({"Error" : true, "Message" : "Error executing MySQL query"});
+            } else {
+                res.json({"Error" : false});
+            }
+        });
+    });
 }
 
 // The next line just makes this module available... think of it as a kind package statement in Java
