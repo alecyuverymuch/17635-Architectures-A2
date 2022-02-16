@@ -71,7 +71,7 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
 
     // This method will return all the entries in the orderinfo database
 
-    public String retrieveOrders() throws RemoteException
+    public String retrieveOrders(UserCredentials credentials) throws RemoteException
     {
       	// Local declarations
 
@@ -81,6 +81,9 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
         							// if not you get an error string
         try
         {
+            UserAuthentication(credentials);
+            // TODO: Logging Function
+
             // Here we load and initialize the JDBC connector. Essentially a static class
             // that is used to provide access to the database from inside this class.
 
@@ -149,7 +152,7 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
     // This method will returns the order in the orderinfo database corresponding to the id
     // provided in the argument.
 
-    public String retrieveOrders(String orderid) throws RemoteException
+    public String retrieveOrders(String orderid, UserCredentials credentials) throws RemoteException
     {
       	// Local declarations
 
@@ -160,6 +163,9 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
 
         try
         {
+            UserAuthentication(credentials);
+            // TODO: Logging Function
+            
             // Here we load and initialize the JDBC connector. Essentially a static class
             // that is used to provide access to the database from inside this class.
 
@@ -226,5 +232,19 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
         return(ReturnString);
 
     } //retrieve order by id
+
+    private UserAuthentication(UserCredentials credentials) throws RemoteException
+    {
+        // Get the registry entry for AuthServices service
+        String entry = registry.getProperty("AuthServices");
+        String host = entry.split(":")[0];
+        String port = entry.split(":")[1];
+        // Get the RMI registry
+        Registry reg = LocateRegistry.getRegistry(host, Integer.parseInt(port));
+        AuthServicesAI obj = (AuthServicesAI)reg.lookup("AuthServices");
+        response = obj.AuthenticateUser(credentials);
+        if (!response)
+            throw new RemoteException("Invalid Credentials");
+    }
 
 } // RetrieveServices
