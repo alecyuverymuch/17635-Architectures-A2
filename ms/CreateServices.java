@@ -37,6 +37,8 @@ public class CreateServices extends UnicastRemoteObject implements CreateService
     // Do nothing constructor
     public CreateServices() throws RemoteException {}
 
+    private static AuthServices auth = null;
+
     // Main service loop
     public static void main(String args[]) 
     { 	
@@ -47,6 +49,7 @@ public class CreateServices extends UnicastRemoteObject implements CreateService
         try 
         { 
             CreateServices obj = new CreateServices();
+            auth = new AuthServices();
 
             Registry registry = Configuration.createRegistry();
             registry.bind("CreateServices", obj);
@@ -123,18 +126,11 @@ public class CreateServices extends UnicastRemoteObject implements CreateService
 
     } //retrieve all orders
 
-    private UserAuthentication(UserCredentials credentials) throws RemoteException
+    private void UserAuthentication(UserCredentials credentials) throws Exception
     {
-        // Get the registry entry for AuthServices service
-        String entry = registry.getProperty("AuthServices");
-        String host = entry.split(":")[0];
-        String port = entry.split(":")[1];
-        // Get the RMI registry
-        Registry reg = LocateRegistry.getRegistry(host, Integer.parseInt(port));
-        AuthServicesAI obj = (AuthServicesAI)reg.lookup("AuthServices");
-        response = obj.AuthenticateUser(credentials);
-        if (!response)
-            throw new RemoteException("Invalid Credentials");
+        Boolean authenticated = auth.AuthenticateUser(credentials);
+        if (!authenticated)
+            throw new Exception("Invalid Credentials");
     }
 
 } // RetrieveServices

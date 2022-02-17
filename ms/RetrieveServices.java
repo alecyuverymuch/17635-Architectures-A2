@@ -38,6 +38,8 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
     // Do nothing constructor
     public RetrieveServices() throws RemoteException {}
 
+    private static AuthServices auth = null;
+
     // Main service loop
     public static void main(String args[]) 
     { 	
@@ -48,6 +50,7 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
         try 
         { 
             RetrieveServices obj = new RetrieveServices();
+            auth = new AuthServices();
 
             Registry registry = Configuration.createRegistry();
             registry.bind("RetrieveServices", obj);
@@ -233,18 +236,11 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
 
     } //retrieve order by id
 
-    private UserAuthentication(UserCredentials credentials) throws RemoteException
+    private void UserAuthentication(UserCredentials credentials) throws Exception
     {
-        // Get the registry entry for AuthServices service
-        String entry = registry.getProperty("AuthServices");
-        String host = entry.split(":")[0];
-        String port = entry.split(":")[1];
-        // Get the RMI registry
-        Registry reg = LocateRegistry.getRegistry(host, Integer.parseInt(port));
-        AuthServicesAI obj = (AuthServicesAI)reg.lookup("AuthServices");
-        response = obj.AuthenticateUser(credentials);
-        if (!response)
-            throw new RemoteException("Invalid Credentials");
+        Boolean authenticated = auth.AuthenticateUser(credentials);
+        if (!authenticated)
+            throw new Exception("Invalid Credentials");
     }
 
 } // RetrieveServices

@@ -70,7 +70,7 @@ public class AuthServices extends UnicastRemoteObject implements AuthServicesAI 
 
             stmt = conn.createStatement();
             
-            String sql = "INSERT INTO users(user_name, password) VALUES (\""+credentials.username+"\",\""+credentials.password+"\")";
+            String sql = "INSERT INTO users(user_name, password) VALUES (\""+credentials.getUsername()+"\",\""+credentials.getPassword()+"\")";
 
             // execute the update
 
@@ -84,7 +84,6 @@ public class AuthServices extends UnicastRemoteObject implements AuthServicesAI 
             conn.close();
 
         } catch(Exception e) {
-
             ReturnString = e.toString();
         } 
         
@@ -92,7 +91,7 @@ public class AuthServices extends UnicastRemoteObject implements AuthServicesAI 
 
     }
 
-    Boolean AuthenticateUser(UserCredentials credentials) throws RemoteException 
+    public Boolean AuthenticateUser(UserCredentials credentials) throws RemoteException 
     {
         // Local declarations
         Connection conn = null;		// connection to the orderinfo database
@@ -119,7 +118,7 @@ public class AuthServices extends UnicastRemoteObject implements AuthServicesAI 
             stmt = conn.createStatement();
             
             String sql;
-            sql = "SELECT * FROM users where user_name=" + credentials.username;
+            sql = "SELECT * FROM users where user_name='" + credentials.getUsername()+"'";
             ResultSet rs = stmt.executeQuery(sql);
 
             // Extract data from result set. Note there should only be one for this method.
@@ -133,7 +132,7 @@ public class AuthServices extends UnicastRemoteObject implements AuthServicesAI 
                 String username = rs.getString("user_name");
                 String password = rs.getString("password");
 
-                if (password.equals(credentials.password))
+                if (password.equals(credentials.getPassword()))
                     authenticated = true;
             }
 
@@ -146,6 +145,7 @@ public class AuthServices extends UnicastRemoteObject implements AuthServicesAI 
             conn.close();
 
         } catch(Exception e) {
+            System.out.println("AuthServices err: " + e.getMessage());
             authenticated = false;
         } 
 

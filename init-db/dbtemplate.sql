@@ -58,7 +58,7 @@ CREATE TABLE `users` (
   `user_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `user_name` varchar(20) DEFAULT NULL,
   `password` varchar(20) DEFAULT NULL,
-  PRIMARY KEY (`order_id`)
+  PRIMARY KEY (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 LOCK TABLES `users` WRITE;
 UNLOCK TABLES;
