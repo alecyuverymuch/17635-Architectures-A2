@@ -118,6 +118,43 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection) {
             }
         });
     });
+
+    router.post("/signUp",function(req,res){
+        console.log("Signing the user up");
+        var query = "INSERT INTO ??(??,??) VALUES (?,?)";
+        var table = ["users","user_name","password",req.body.user_name,req.body.password];
+        query = mysql.format(query,table);
+        connection.query(query,function(err,rows){
+            if(err) {
+                console.log(err);
+                res.json({"Error" : true, "Message" : "Error executing MySQL query"});
+            } else {
+                res.json({"Error" : false, "Message" : "User Signed Up !"});
+            }
+        });
+    });
+
+    router.post("/signIn",function(req,res){
+        console.log("Signing in user");
+        var query = "SELECT * FROM ?? WHERE ??=? AND ??=?";
+        var table = ["users","user_name",req.body.user_name,"password",req.body.password];
+        query = mysql.format(query,table);
+        connection.query(query,function(err,rows){
+            if(err) {
+                res.json({"Error" : true, "Message" : "Error executing MySQL query"});
+            } else {
+                /**
+                 * Verify...
+                 */
+                if(rows.length>0){
+                    res.json(true);
+                }
+                else{
+                    res.json(false);
+                }
+            }
+        });
+    });
 }
 
 // The next line just makes this module available... think of it as a kind package statement in Java
