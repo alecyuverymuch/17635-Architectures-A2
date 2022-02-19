@@ -49,7 +49,7 @@ REST_ROUTER.prototype.handleRoutes = function (router, connection, logger) {
     // req parameter is the request object
     // res parameter is the response object  
     router.get("/orders", function (req, res) {
-        console.log("Getting all database entries...");
+        logger.info("Getting all database entries...");
         var query = "SELECT * FROM ??";
         var table = ["orders"];
         query = mysql.format(query, table);
@@ -67,7 +67,7 @@ REST_ROUTER.prototype.handleRoutes = function (router, connection, logger) {
     // res parameter is the response object
 
     router.get("/orders/:order_id", function (req, res) {
-        console.log("Getting order ID: ", req.params.order_id);
+        logger.info("Getting order ID: %s", req.params.order_id);
         var query = "SELECT * FROM ?? WHERE ??=?";
         var table = ["orders", "order_id", req.params.order_id];
         query = mysql.format(query, table);
@@ -83,11 +83,8 @@ REST_ROUTER.prototype.handleRoutes = function (router, connection, logger) {
     // POST for /orders?order_date&first_name&last_name&address&phone - adds order
     // req paramdter is the request object - note to get parameters (eg. stuff afer the '?') you must use req.body.param
     // res parameter is the response object 
-
     router.post("/orders", function (req, res) {
-        //console.log("url:", req.url);
-        //console.log("body:", req.body);
-        console.log("Adding to orders table ", req.body.order_date, ",", req.body.first_name, ",", req.body.last_name, ",", req.body.address, ",", req.body.phone);
+        logger.info("Adding to orders table Order Date: %s, First Name: %s, Last Name: %s, Address: %s,Phone: %s", req.body.order_date, req.body.first_name, req.body.last_name, req.body.address, req.body.phone);
         var query = "INSERT INTO ??(??,??,??,??,??) VALUES (?,?,?,?,?)";
         var table = ["orders", "order_date", "first_name", "last_name", "address", "phone", req.body.order_date, req.body.first_name, req.body.last_name, req.body.address, req.body.phone];
         query = mysql.format(query, table);
