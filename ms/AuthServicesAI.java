@@ -2,8 +2,8 @@ import java.rmi.*;
 
 public interface AuthServicesAI extends java.rmi.Remote 
 {
-    String CreateUser(UserCredentials credentials) throws RemoteException;
-    String AuthenticateUser(UserCredentials credentials) throws RemoteException;
-    String AuthenticateToken(String token) throws RemoteException;
-    void ExpireToken(String token) throws RemoteException;
+    String createUser(UserCredentials credentials) throws RemoteException;
+    String authenticateUser(UserCredentials credentials) throws RemoteException;
+    String authenticateToken(String token) throws RemoteException;
+    void expireToken(String token) throws RemoteException;
 }

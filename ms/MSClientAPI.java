@@ -34,62 +34,62 @@ public class MSClientAPI
 	Properties registry = null;
 
 	public MSClientAPI() throws IOException {
-		  // Loads the registry from 'registry.properties'
-		  // This files contains entries like:
-		  //    <Service> = <host>:<port>
-		  // indicating that a service is registered in 
-		  // an RMI registry at host on port
-		  registry = new Properties();
-		  registry.load(new FileReader("registry.properties"));
+		// Loads the registry from 'registry.properties'
+		// This files contains entries like:
+		//    <Service> = <host>:<port>
+		// indicating that a service is registered in 
+		// an RMI registry at host on port
+		registry = new Properties();
+		registry.load(new FileReader("registry.properties"));
 	}
 
 	public String signUp(UserCredentials credentials) throws Exception
 	{
 		// Get the registry entry for AuthServices service
-        String entry = registry.getProperty("AuthServices");
-        String host = entry.split(":")[0];
-        String port = entry.split(":")[1];
-        // Get the RMI registry
-        Registry reg = LocateRegistry.getRegistry(host, Integer.parseInt(port));
-        AuthServicesAI obj = (AuthServicesAI)reg.lookup("AuthServices");
-		response = obj.CreateUser(credentials);
+		String entry = registry.getProperty("AuthServices");
+		String host = entry.split(":")[0];
+		String port = entry.split(":")[1];
+		// Get the RMI registry
+		Registry reg = LocateRegistry.getRegistry(host, Integer.parseInt(port));
+		AuthServicesAI obj = (AuthServicesAI)reg.lookup("AuthServices");
+		response = obj.createUser(credentials);
 		return response;
 	}
 
 	public String login(UserCredentials credentials) throws Exception
 	{
 		// Get the registry entry for AuthServices service
-        String entry = registry.getProperty("AuthServices");
-        String host = entry.split(":")[0];
-        String port = entry.split(":")[1];
-        // Get the RMI registry
-        Registry reg = LocateRegistry.getRegistry(host, Integer.parseInt(port));
-        AuthServicesAI obj = (AuthServicesAI)reg.lookup("AuthServices");
-        return obj.AuthenticateUser(credentials);
+		String entry = registry.getProperty("AuthServices");
+		String host = entry.split(":")[0];
+		String port = entry.split(":")[1];
+		// Get the RMI registry
+		Registry reg = LocateRegistry.getRegistry(host, Integer.parseInt(port));
+		AuthServicesAI obj = (AuthServicesAI)reg.lookup("AuthServices");
+		return obj.authenticateUser(credentials);
 	}
 
 	public String authenticate(String token) throws Exception
 	{
 		// Get the registry entry for AuthServices service
-        String entry = registry.getProperty("AuthServices");
-        String host = entry.split(":")[0];
-        String port = entry.split(":")[1];
-        // Get the RMI registry
-        Registry reg = LocateRegistry.getRegistry(host, Integer.parseInt(port));
-        AuthServicesAI obj = (AuthServicesAI)reg.lookup("AuthServices");
-        return obj.AuthenticateToken(token);
+		String entry = registry.getProperty("AuthServices");
+		String host = entry.split(":")[0];
+		String port = entry.split(":")[1];
+		// Get the RMI registry
+		Registry reg = LocateRegistry.getRegistry(host, Integer.parseInt(port));
+		AuthServicesAI obj = (AuthServicesAI)reg.lookup("AuthServices");
+		return obj.authenticateToken(token);
 	}
 
 	public void expireSession(String token) throws Exception
 	{
-		 // Get the registry entry for AuthServices service
-		 String entry = registry.getProperty("AuthServices");
-		 String host = entry.split(":")[0];
-		 String port = entry.split(":")[1];
-		 // Get the RMI registry
-		 Registry reg = LocateRegistry.getRegistry(host, Integer.parseInt(port));
-		 AuthServicesAI obj = (AuthServicesAI)reg.lookup("AuthServices");
-		 obj.ExpireToken(token);
+		// Get the registry entry for AuthServices service
+		String entry = registry.getProperty("AuthServices");
+		String host = entry.split(":")[0];
+		String port = entry.split(":")[1];
+		// Get the RMI registry
+		Registry reg = LocateRegistry.getRegistry(host, Integer.parseInt(port));
+		AuthServicesAI obj = (AuthServicesAI)reg.lookup("AuthServices");
+		obj.expireToken(token);
 	}
 
 	/********************************************************************************
@@ -138,8 +138,7 @@ public class MSClientAPI
 		Registry reg = LocateRegistry.getRegistry(host, Integer.parseInt(port));
 		RetrieveServicesAI obj = (RetrieveServicesAI )reg.lookup("RetrieveServices");
 		response = obj.retrieveOrders(id);
-		return(response);	
-
+		return(response);
 	}
 
 	/********************************************************************************

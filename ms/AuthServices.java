@@ -48,7 +48,7 @@ public class AuthServices extends UnicastRemoteObject implements AuthServicesAI 
 
     } // main
 
-    public String CreateUser(UserCredentials credentials) throws RemoteException 
+    public String createUser(UserCredentials credentials) throws RemoteException 
     {
         // Local declarations
 
@@ -95,7 +95,7 @@ public class AuthServices extends UnicastRemoteObject implements AuthServicesAI 
 
     }
 
-    public String AuthenticateUser(UserCredentials credentials) throws RemoteException 
+    public String authenticateUser(UserCredentials credentials) throws RemoteException 
     {
         // Local declarations
         Connection conn = null;		// connection to the orderinfo database
@@ -154,14 +154,14 @@ public class AuthServices extends UnicastRemoteObject implements AuthServicesAI 
             conn.close();
 
         } catch(Exception e) {
-            System.out.println("AuthServices err: " + e.getMessage());
+            // TODO: Logging
             authenticated = false;
         } 
 
         return authenticated ? token : null;
     }
 
-    public String AuthenticateToken(String token) throws RemoteException 
+    public String authenticateToken(String token) throws RemoteException 
     {
         if (sessions.containsKey(token))
             return sessions.get(token).getUsername();
@@ -169,7 +169,7 @@ public class AuthServices extends UnicastRemoteObject implements AuthServicesAI 
         return null;
     }
 
-    public void ExpireToken(String token) throws RemoteException
+    public void expireToken(String token) throws RemoteException
     {
         if (sessions.containsKey(token))
             sessions.remove(token);
