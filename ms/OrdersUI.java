@@ -37,7 +37,7 @@ public class OrdersUI
 
 		String username = null, password = null;
 		Boolean authenticated = false;
-		UserCredentials sessionCredentials = null;
+		String sessionToken = null;
 
 		while (!authenticated) {
 			System.out.println( "\n\n\n\n" );
@@ -117,10 +117,10 @@ public class OrdersUI
 					{
 						System.out.println("\nLoging in...");
 						UserCredentials user = new UserCredentials(username, password);
-						Boolean authResponse = api.authenticate(user);
-						if (authResponse) 
+						String authToken = api.login(user);
+						if (authToken != null) 
 						{
-							sessionCredentials = user;
+							sessionToken = authToken;
 							authenticated = true;
 							
 							System.out.println("Authentication Successful:");
@@ -152,7 +152,9 @@ public class OrdersUI
 			if ( ( option == 'X' ) || ( option == 'x' ))
 			{
 				// Here the user is done, so we set the Done flag and halt the system
-				sessionCredentials = null;
+				if (sessionToken != null)
+					api.expireSession(sessionToken);
+				sessionToken = null;
 				authenticated = false;
 				
 				System.out.println( "\nDone...\n\n" );
@@ -161,10 +163,10 @@ public class OrdersUI
 		}
 
 		if (authenticated) 
-			main_menu(sessionCredentials);
+			main_menu(sessionToken);
 	}
 
-	private static void main_menu(UserCredentials credentials) throws Exception
+	private static void main_menu(String sessionToken) throws Exception
 	{
 		boolean done = false;						// main loop flag
 		boolean error = false;						// error flag
@@ -212,7 +214,7 @@ public class OrdersUI
 				System.out.println( "\nRetrieving All Orders::" );
 				try
 				{
-					response = api.retrieveOrders(credentials);
+					response = api.retrieveOrders(sessionToken);
 					System.out.println(response);
 
 				} catch (Exception e) {
@@ -254,7 +256,7 @@ public class OrdersUI
 
 				try
 				{
-					response = api.retrieveOrders(orderid, credentials);
+					response = api.retrieveOrders(orderid, sessionToken);
 					System.out.println(response);
 
 				} catch (Exception e) {
@@ -307,7 +309,7 @@ public class OrdersUI
 					try
 					{
 						System.out.println("\nCreating order...");
-						response = api.newOrder(date, first, last, address, phone, credentials);
+						response = api.newOrder(date, first, last, address, phone, sessionToken);
 						System.out.println(response);
 
 					} catch(Exception e) {
@@ -354,7 +356,7 @@ public class OrdersUI
 
 				try
 				{
-					response = api.deleteOrder(orderid, credentials);
+					response = api.deleteOrder(orderid, sessionToken);
 					System.out.println(response);
 
 				} catch (Exception e) {
@@ -373,7 +375,9 @@ public class OrdersUI
 			if ( ( option == 'X' ) || ( option == 'x' ))
 			{
 				// Here the user is done, so we set the Done flag and halt the system
-
+				if (sessionToken != null)
+					api.expireSession(sessionToken);
+					
 				done = true;
 				System.out.println( "\nDone...\n\n" );
 

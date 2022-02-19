@@ -16,8 +16,6 @@ public class DeleteServices extends UnicastRemoteObject implements DeleteService
     // Do nothing constructor
     public DeleteServices() throws RemoteException {}
 
-    private static AuthServices auth = null;
-
     // Main service loop
     public static void main(String args[]) 
     { 	
@@ -28,7 +26,6 @@ public class DeleteServices extends UnicastRemoteObject implements DeleteService
         try 
         { 
             DeleteServices obj = new DeleteServices();
-            auth = new AuthServices();
 
             Registry registry = Configuration.createRegistry();
             registry.bind("DeleteServices", obj);
@@ -47,7 +44,7 @@ public class DeleteServices extends UnicastRemoteObject implements DeleteService
 
     } // main
 
-    public String deleteOrder(String orderid, UserCredentials credentials) throws RemoteException
+    public String deleteOrder(String orderid) throws RemoteException
     {
       	// Local declarations
 
@@ -57,7 +54,6 @@ public class DeleteServices extends UnicastRemoteObject implements DeleteService
 
         try
         {
-            UserAuthentication(credentials);
             // TODO: Logging Function
 
             // Here we load and initialize the JDBC connector. Essentially a static class
@@ -95,11 +91,4 @@ public class DeleteServices extends UnicastRemoteObject implements DeleteService
         return(ReturnString);
 
     } //retrieve order by id
-
-    private void UserAuthentication(UserCredentials credentials) throws Exception
-    {
-        Boolean authenticated = auth.AuthenticateUser(credentials);
-        if (!authenticated)
-            throw new Exception("Invalid Credentials");
-    }
 }
