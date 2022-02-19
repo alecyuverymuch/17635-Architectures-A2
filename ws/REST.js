@@ -27,9 +27,9 @@
 
 var mysql = require("mysql");     //Database
 
-function REST_ROUTER(router, connection) {
+function REST_ROUTER(router, connection, logger) {
     var self = this;
-    self.handleRoutes(router, connection);
+    self.handleRoutes(router, connection, logger);
 }
 
 // Here is where we define the routes. Essentially a route is a path taken through the code dependent upon the 

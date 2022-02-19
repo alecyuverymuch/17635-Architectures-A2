@@ -41,29 +41,19 @@ const myWinstonOptions = {
 			format: 'YYYY-MM-DD HH:mm:ss'
 		}),
 		format.errors({ stack: true }),
-		format.splat()
-		// format.json()
+		format.splat(),
+		format.json()
 	),
 	defaultMeta: { service: 'ws-service' },
 	transports: [
 		new winston.transports.Console(),
-		new winston.transports.File({ filename: 'logs/ws-server-error.log', level: 'error' }),
-		new winston.transports.File({ filename: 'logs/ws-server-combined.log' })
+		new winston.transports.File({ filename: '/var/logs/ws-server-error.log', level: 'error' }),
+		new winston.transports.File({ filename: '/var/logs/ws-server-combined.log' })
 	]
 }
 const logger = new winston.createLogger(myWinstonOptions)
 
-function logRequest(req, res, next) {
-	logger.info(req.url)
-	next()
-}
-app.use(logRequest)
-
-function logError(err, req, res, next) {
-	logger.error(err)
-	next()
-}
-app.use(logError)
+logger.info("Starting up server....")
 /* End Winston */
 
 // Function definition
