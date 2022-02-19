@@ -111,14 +111,15 @@ REST.prototype.configureExpress = function (connection) {
 
 REST.prototype.startServer = function () {
 	app.listen(3000, function () {
-		console.log("Server Started at Port 3000.");
+		logger.info("Server Started at Port 3000.");
 	});
 }
 
 // We land here if we can't connect to mysql
 
 REST.prototype.stop = function (err) {
-	console.log("Issue connecting with mysql and/or connecting to the database.\n" + err);
+	logger.error(new Error("Issue connecting with mysql and/or connecting to the database.\n"));
+	logger.error(err);
 	process.exit(1);
 }
 
