@@ -65,7 +65,6 @@ REST_ROUTER.prototype.handleRoutes = function (router, connection, logger) {
     // GET for /orders/order id specifier - returns the order for the provided order ID
     // req paramdter is the request object
     // res parameter is the response object
-
     router.get("/orders/:order_id", function (req, res) {
         logger.info("Getting order ID: %s", req.params.order_id);
         var query = "SELECT * FROM ?? WHERE ??=?";
@@ -73,6 +72,7 @@ REST_ROUTER.prototype.handleRoutes = function (router, connection, logger) {
         query = mysql.format(query, table);
         connection.query(query, function (err, rows) {
             if (err) {
+                logger.error(err);
                 res.json({ "Error": true, "Message": "Error executing MySQL query" });
             } else {
                 res.json({ "Error": false, "Message": "Success", "Users": rows });

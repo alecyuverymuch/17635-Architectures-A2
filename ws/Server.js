@@ -47,8 +47,8 @@ const myWinstonOptions = {
 	transports: [
 		consoleTransport,
 		new winston.transports.Console(),
-		new transports.File({ filename: 'ws-server-error.log', level: 'error' }),
-		new transports.File({ filename: 'ws-server-combined.log' })
+		new transports.File({ filename: 'logs/ws-server-error.log', level: 'error' }),
+		new transports.File({ filename: 'logs/ws-server-combined.log' })
 	]
 }
 const logger = new winston.createLogger(myWinstonOptions)
