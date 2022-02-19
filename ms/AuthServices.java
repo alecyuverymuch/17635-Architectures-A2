@@ -161,9 +161,12 @@ public class AuthServices extends UnicastRemoteObject implements AuthServicesAI 
         return authenticated ? token : null;
     }
 
-    public Boolean AuthenticateToken(String token) throws RemoteException 
+    public String AuthenticateToken(String token) throws RemoteException 
     {
-        return sessions.containsKey(token);
+        if (sessions.containsKey(token))
+            return sessions.get(token).getUsername();
+        
+        return null;
     }
 
     public void ExpireToken(String token) throws RemoteException

@@ -68,7 +68,7 @@ public class MSClientAPI
         return obj.AuthenticateUser(credentials);
 	}
 
-	public Boolean authenticate(String token) throws Exception
+	public String authenticate(String token) throws Exception
 	{
 		// Get the registry entry for AuthServices service
         String entry = registry.getProperty("AuthServices");
@@ -102,7 +102,8 @@ public class MSClientAPI
 
 	public String retrieveOrders(String token) throws Exception
 	{
-		if (!authenticate(token))
+		String user = null;
+		if ((user = authenticate(token)) == null)
 			throw new Exception("User not authenticated");
 		// Get the registry entry for RetrieveServices service
 		String entry = registry.getProperty("RetrieveServices");
@@ -126,7 +127,8 @@ public class MSClientAPI
 
 	public String retrieveOrders(String id, String token) throws Exception
 	{
-		if (!authenticate(token))
+		String user = null;
+		if ((user = authenticate(token)) == null)
 			throw new Exception("User not authenticated");
 		// Get the registry entry for RetrieveServices service
 		String entry = registry.getProperty("RetrieveServices");
@@ -148,7 +150,8 @@ public class MSClientAPI
 
    	public String newOrder(String Date, String FirstName, String LastName, String Address, String Phone, String token) throws Exception
 	{
-		if (!authenticate(token))
+		String user = null;
+		if ((user = authenticate(token)) == null)
 			throw new Exception("User not authenticated");
 		// Get the registry entry for CreateServices service
 		String entry = registry.getProperty("CreateServices");
@@ -163,7 +166,8 @@ public class MSClientAPI
 
 	public String deleteOrder(String id, String token) throws Exception
 	{
-		if (!authenticate(token))
+		String user = null;
+		if ((user = authenticate(token)) == null)
 			throw new Exception("User not authenticated");
 		// Get the registry entry for DeleteServices service
 		String entry = registry.getProperty("DeleteServices");
