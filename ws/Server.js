@@ -33,6 +33,7 @@ var app = express();                         //express instance
 
 /* Winston setup for logging */
 const winston = require('winston')
+const format = winston.format
 const myWinstonOptions = {
 	level: 'info',
 	format: format.combine(
@@ -45,10 +46,9 @@ const myWinstonOptions = {
 	),
 	defaultMeta: { service: 'ws-service' },
 	transports: [
-		consoleTransport,
 		new winston.transports.Console(),
-		new transports.File({ filename: 'logs/ws-server-error.log', level: 'error' }),
-		new transports.File({ filename: 'logs/ws-server-combined.log' })
+		new winston.transports.File({ filename: 'logs/ws-server-error.log', level: 'error' }),
+		new winston.transports.File({ filename: 'logs/ws-server-combined.log' })
 	]
 }
 const logger = new winston.createLogger(myWinstonOptions)
