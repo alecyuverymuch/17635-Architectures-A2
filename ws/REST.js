@@ -26,22 +26,24 @@
 ******************************************************************************************************************/
 
 var mysql = require("mysql");     //Database
+const ENDPOINTS = require("./EndpointConfig");
 
-function REST_ROUTER(router,connection) {
+function REST_ROUTER(router,connection, allActiveUsers) {
     var self = this;
-    self.handleRoutes(router,connection);
+    self.handleRoutes(router,connection, allActiveUsers);
 }
 
 // Here is where we define the routes. Essentially a route is a path taken through the code dependent upon the 
 // contents of the URL
 
-REST_ROUTER.prototype.handleRoutes= function(router,connection) {
+REST_ROUTER.prototype.handleRoutes= function(router,connection, allActiveUsers) {
 
     // GET with no specifier - returns system version information
     // req paramdter is the request object
     // res parameter is the response object
 
     router.get("/",function(req,res){
+        console.log('Health check');
         res.json({"Message":"Orders Webservices Server Version 1.0"});
     });
     
@@ -49,7 +51,7 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection) {
     // req paramdter is the request object
     // res parameter is the response object
   
-    router.get("/orders",function(req,res){
+    router.get(ENDPOINTS.GET_ORDER_ALL,function(req,res){
         console.log("Getting all database entries..." );
         var query = "SELECT * FROM ??";
         var table = ["orders"];
@@ -67,7 +69,7 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection) {
     // req paramdter is the request object
     // res parameter is the response object
      
-    router.get("/orders/:order_id",function(req,res){
+    router.get(ENDPOINTS.GET_ORDER_BY_ID,function(req,res){
         console.log("Getting order ID: ", req.params.order_id );
         var query = "SELECT * FROM ?? WHERE ??=?";
         var table = ["orders","order_id",req.params.order_id];
@@ -85,7 +87,7 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection) {
     // req paramdter is the request object - note to get parameters (eg. stuff afer the '?') you must use req.body.param
     // res parameter is the response object 
   
-    router.post("/orders",function(req,res){
+    router.post(ENDPOINTS.POST_ORDER,function(req,res){
         //console.log("url:", req.url);
         //console.log("body:", req.body);
         console.log("Adding to orders table ", req.body.order_date,",",req.body.first_name,",",req.body.last_name,",",req.body.address,",",req.body.phone);
@@ -105,7 +107,7 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection) {
     // req paramdter is the request object
     // res parameter is the response object
 
-    router.delete("/orders/:order_id",function(req,res){
+    router.delete(ENDPOINTS.DELETE_ORDER_BY_ID,function(req,res){
         console.log("Deleting order ID: ", req.params.order_id);
         var query = "DELETE FROM ?? WHERE ??=?";
         var table = ["orders","order_id",req.params.order_id];
@@ -119,7 +121,7 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection) {
         });
     });
 
-    router.post("/signUp",function(req,res){
+    router.post(ENDPOINTS.SIGN_UP,function(req,res){
         console.log("Signing the user up");
         var query = "INSERT INTO ??(??,??) VALUES (?,?)";
         var table = ["users","user_name","password",req.body.user_name,req.body.password];
@@ -134,7 +136,7 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection) {
         });
     });
 
-    router.post("/signIn",function(req,res){
+    router.post(ENDPOINTS.SIGN_IN,function(req,res){
         console.log("Signing in user");
         var query = "SELECT * FROM ?? WHERE ??=? AND ??=?";
         var table = ["users","user_name",req.body.user_name,"password",req.body.password];
@@ -147,13 +149,18 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection) {
                  * Verify...
                  */
                 if(rows.length>0){
-                    res.json(true);
+                    res.json(req.username);
                 }
                 else{
                     res.json(false);
                 }
             }
         });
+    });
+
+    router.post(ENDPOINTS.EXIT,function(req,res){
+        allActiveUsers.delete(req.username);
+        res.sendStatus(200);
     });
 }
 

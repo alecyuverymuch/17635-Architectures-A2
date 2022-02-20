@@ -30,6 +30,44 @@ var mysql   = require("mysql");               //Database
 var bodyParser  = require("body-parser");     //Javascript parser utility
 var rest = require("./REST.js");              //REST services/handler module
 var app  = express();                         //express instance
+const ENDPOINTS = require("./EndpointConfig");
+
+const UNSECURED_ENDPOINTS = [
+    ENDPOINTS.SIGN_IN,
+    ENDPOINTS.SIGN_UP,
+    ENDPOINTS.EXIT,
+    ENDPOINTS.HEALTH
+];
+
+const USERNAME_HEADER_KEY = 'u-token'; // Header name for the username token
+const allActiveUsers = new Set(); // Stores the usernames of all the active users
+
+/**
+ * 
+ * Verifies whether the user is currently logged in
+ * If the user is not logged in for secured endpoints, then it terminates the api
+ *
+ * @param {Object} req
+ * @param {Object} res
+ * @param {Function} next
+ */
+function verifyAuthentication(req, res, next) {
+    if (UNSECURED_ENDPOINTS.findIndex((ep) => req.originalUrl.indexOf(ep) >= 0) !== -1) {
+        return next();
+    }
+    // Check if token is passed in the header
+    if (!req.headers[USERNAME_HEADER_KEY]) {
+        return res.sendStatus(401);
+    }
+    const username = req.headers[USERNAME_HEADER_KEY];
+    // Check if the user is currently loggedin
+    if (allActiveUsers.has(username)) {
+        Object.assign(req, {username});
+        return next();
+    } else {
+        return res.sendStatus(401); // Not authenticated
+    }
+}
 
 // Function definition
 function REST(){
@@ -66,8 +104,10 @@ REST.prototype.configureExpress = function(connection) {
       app.use(bodyParser.json());
       app.use(bodyParser.text());
       var router = express.Router();
-      app.use('/api', router);
-      var rest_router = new rest(router,connection);
+      // Verify the unrouted
+    //   app.use((err, req, res, next) => verifyAuthentication(err, req, res, next));
+      app.use('/api', verifyAuthentication, router);
+      var rest_router = new rest(router,connection, allActiveUsers);
       self.startServer();
 }
 
