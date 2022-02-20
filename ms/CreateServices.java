@@ -82,6 +82,8 @@ public class CreateServices extends UnicastRemoteObject implements CreateService
         							                 // if not you get an error string
         try
         {
+            // TODO: Logging function
+
             // Here we load and initialize the JDBC connector. Essentially a static class
             // that is used to provide access to the database from inside this class.
 
@@ -119,5 +121,4 @@ public class CreateServices extends UnicastRemoteObject implements CreateService
         return(ReturnString);
 
     } //retrieve all orders
-
 } // RetrieveServices

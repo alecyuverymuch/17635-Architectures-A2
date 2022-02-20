@@ -54,6 +54,8 @@ public class DeleteServices extends UnicastRemoteObject implements DeleteService
 
         try
         {
+            // TODO: Logging Function
+
             // Here we load and initialize the JDBC connector. Essentially a static class
             // that is used to provide access to the database from inside this class.
 
@@ -89,5 +91,4 @@ public class DeleteServices extends UnicastRemoteObject implements DeleteService
         return(ReturnString);
 
     } //retrieve order by id
-
 }

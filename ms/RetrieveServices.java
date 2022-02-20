@@ -81,6 +81,8 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
         							// if not you get an error string
         try
         {
+            // TODO: Logging Function
+
             // Here we load and initialize the JDBC connector. Essentially a static class
             // that is used to provide access to the database from inside this class.
 
@@ -160,6 +162,8 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
 
         try
         {
+            // TODO: Logging Function
+            
             // Here we load and initialize the JDBC connector. Essentially a static class
             // that is used to provide access to the database from inside this class.
 
@@ -226,5 +230,4 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
         return(ReturnString);
 
     } //retrieve order by id
-
 } // RetrieveServices

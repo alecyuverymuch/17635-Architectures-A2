@@ -42,5 +42,5 @@ public interface RetrieveServicesAI extends java.rmi.Remote
 	* pairs format.
 	*******************************************************/	
 
-	String retrieveOrders(String id ) throws RemoteException;
+	String retrieveOrders(String id) throws RemoteException;
 }
