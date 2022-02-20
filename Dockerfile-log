@@ -6,10 +6,12 @@ COPY ms/mysql-connector-java-5.1.45-bin.jar lib/
 ENV CLASSPATH=.:lib/mysql-connector-java-5.1.45-bin.jar:${CLASSPATH}
 
 COPY ms/Configuration-tmplt.java ./
+RUN mkdir -p /logs
+RUN mkdir -p /log
 RUN sed "s/<PASSWORD>/${MYSQL_PASSWORD}/g" < Configuration-tmplt.java > Configuration.java
 RUN rm Configuration-tmplt.java
 
-COPY ms/DeleteServices.java ms/DeleteServicesAI.java ms/LogService.java ms/LogConnector.java ms/LogServiceAI.java ms/registry.properties ./
+COPY ms/LogConnector.java ms/LogServiceAI.java ms/LogService.java ms/registry.properties ms/LogService.java ms/LogConnector.java ms/LogServiceAI.java ms/registry.properties ./
 RUN javac *.java
 
-CMD java DeleteServices
+CMD java LogService

@@ -38,7 +38,6 @@ public class OrdersUI
 		String username = null, password = null;
 		Boolean authenticated = false;
 		String sessionToken = null;
-
 		while (!authenticated) {
 			System.out.println( "\n\n\n\n" );
 			System.out.println( "Orders Database Login: \n" );

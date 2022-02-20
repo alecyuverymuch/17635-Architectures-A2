@@ -1,6 +1,24 @@
 version: "3.1"
 services:
 
+  log:
+    image: ms_log
+    container_name: ms_log
+    build:
+      context: .
+      dockerfile: Dockerfile-log
+      args:
+        MYSQL_PASSWORD: foobar
+    depends_on:
+      - mysql
+    environment:
+      RMI_REMOTE_HOST: ms_log
+      RMI_REMOTE_PORT: 1089
+      MYSQL_REMOTE_HOST: ms_mysql
+      MYSQL_REMOTE_PORT: 3306
+    volumes:
+      - "./ms_logs:/logs"
+
   auth:
     image: ms_auth
     container_name: ms_auth

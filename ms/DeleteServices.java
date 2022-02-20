@@ -12,7 +12,7 @@ public class DeleteServices extends UnicastRemoteObject implements DeleteService
     // Set up the orderinfo database credentials
     static final String USER = "root";
     static final String PASS = Configuration.MYSQL_PASSWORD;
-
+    LogConnector logConnector = new LogConnector("CreateService");
     // Do nothing constructor
     public DeleteServices() throws RemoteException {}
 
@@ -76,7 +76,7 @@ public class DeleteServices extends UnicastRemoteObject implements DeleteService
             String sql;
             sql = "DELETE FROM orders where order_id=" + orderid;
             stmt.executeUpdate(sql);
-
+            logConnector.log("Order deleted:"+orderid);
             stmt.close();
             conn.close();
             stmt.close(); 

@@ -27,6 +27,8 @@ import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.io.File;  // Import the File class
+import java.io.IOException;
 
 public class MSClientAPI
 {
@@ -41,6 +43,19 @@ public class MSClientAPI
 		// an RMI registry at host on port
 		registry = new Properties();
 		registry.load(new FileReader("registry.properties"));
+	}
+
+	public String addLog(String log) throws Exception
+	{
+		// Get the registry entry for AuthServices service
+		String entry = registry.getProperty("LogService");
+		String host = entry.split(":")[0];
+		String port = entry.split(":")[1];
+		// Get the RMI registry
+		Registry reg = LocateRegistry.getRegistry(host, Integer.parseInt(port));
+		LogServiceAI obj = (LogServiceAI)reg.lookup("LogService");
+		response = obj.writeFile(log);
+		return response;
 	}
 
 	public String signUp(UserCredentials credentials) throws Exception

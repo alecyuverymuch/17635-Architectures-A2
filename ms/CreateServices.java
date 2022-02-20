@@ -33,7 +33,7 @@ public class CreateServices extends UnicastRemoteObject implements CreateService
     // Set up the orderinfo database credentials
     static final String USER = "root";
     static final String PASS = Configuration.MYSQL_PASSWORD;
-
+    LogConnector logConnector = new LogConnector("CreateService");
     // Do nothing constructor
     public CreateServices() throws RemoteException {}
 
@@ -106,6 +106,7 @@ public class CreateServices extends UnicastRemoteObject implements CreateService
 
             stmt.executeUpdate(sql);
 
+            logConnector.log("Order created:"+idate+"\",\""+ifirst+"\",\""+ilast+"\",\""+iaddress+"\",\""+iphone);
             // clean up the environment
 
             stmt.close();

@@ -15,7 +15,7 @@ public class AuthServices extends UnicastRemoteObject implements AuthServicesAI 
     static final String PASS = Configuration.MYSQL_PASSWORD;
 
     private static Map<String, UserCredentials> sessions = new HashMap<String, UserCredentials>();
-
+    LogConnector logConnector = new LogConnector("AuthService");
     // Do nothing constructor
     public AuthServices() throws RemoteException {}
 
@@ -38,8 +38,7 @@ public class AuthServices extends UnicastRemoteObject implements AuthServicesAI 
                 System.out.println("\t" + name);
             }
             // Bind this object instance to the name AuthServices in the rmiregistry 
-            // Naming.rebind("//" + Configuration.getRemoteHost() + ":1099/CreateServices", obj); 
-
+            // Naming.rebind("//" + Configuration.getRemoteHost() + ":1099/CreateServices", obj);
         } catch (Exception e) {
 
             System.out.println("AuthServices binding err: " + e.getMessage()); 
@@ -79,7 +78,7 @@ public class AuthServices extends UnicastRemoteObject implements AuthServicesAI 
             // execute the update
 
             stmt.executeUpdate(sql);
-
+            logConnector.log("User signed up:"+credentials.getUsername());
             // clean up the environment
 
             stmt.close();
@@ -142,6 +141,7 @@ public class AuthServices extends UnicastRemoteObject implements AuthServicesAI 
                     authenticated = true;
                     token = CreateToken(credentials);
                     sessions.put(token, credentials);
+                    logConnector.log("User logged in:"+credentials.getUsername());
                 }
             }
 

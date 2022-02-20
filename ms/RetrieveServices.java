@@ -34,7 +34,7 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
     // Set up the orderinfo database credentials
     static final String USER = "root";
     static final String PASS = Configuration.MYSQL_PASSWORD;
-
+    LogConnector logConnector = new LogConnector("RetrieveServices");
     // Do nothing constructor
     public RetrieveServices() throws RemoteException {}
 
@@ -127,6 +127,7 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
                 ReturnString = ReturnString +"{order_id:"+id+", order_date:"+date+", first_name:"+first+", last_name:"
                                +last+", address:"+address+", phone:"+phone+"}";
 
+                logConnector.log("Order retrieved:"+id);
             }
 
             ReturnString = ReturnString +"]";
@@ -209,9 +210,11 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
 
                 ReturnString = ReturnString +"{order_id:"+id+", order_date:"+date+", first_name:"+first+", last_name:"
                                +last+", address:"+address+", phone:"+phone+"}";
+                logConnector.log("Order retrieved:"+id);
             }
 
             ReturnString = ReturnString +"]";
+
 
             //Clean-up environment
 
