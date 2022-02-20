@@ -140,7 +140,7 @@ public class AuthServices extends UnicastRemoteObject implements AuthServicesAI 
                 if (password.equals(credentials.getPassword()))
                 {
                     authenticated = true;
-                    token = CreateToken(credentials);
+                    token = createToken(credentials);
                     sessions.put(token, credentials);
                 }
             }
@@ -175,7 +175,7 @@ public class AuthServices extends UnicastRemoteObject implements AuthServicesAI 
             sessions.remove(token);
     }
 
-    private String CreateToken(UserCredentials credentials) throws Exception
+    private String createToken(UserCredentials credentials) throws Exception
     {
         String sessionString = credentials.getUsername() + credentials.getPassword() + System.currentTimeMillis();
         MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");

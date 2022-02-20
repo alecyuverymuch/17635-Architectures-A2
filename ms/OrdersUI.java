@@ -163,10 +163,10 @@ public class OrdersUI
 		}
 
 		if (authenticated) 
-			main_menu(sessionToken);
+			mainMenu(sessionToken);
 	}
 
-	private static void main_menu(String sessionToken) throws Exception
+	private static void mainMenu(String sessionToken) throws Exception
 	{
 		boolean done = false;						// main loop flag
 		boolean error = false;						// error flag
@@ -377,7 +377,7 @@ public class OrdersUI
 				// Here the user is done, so we set the Done flag and halt the system
 				if (sessionToken != null)
 					api.expireSession(sessionToken);
-					
+
 				done = true;
 				System.out.println( "\nDone...\n\n" );
 
