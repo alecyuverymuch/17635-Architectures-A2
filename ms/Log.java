@@ -14,14 +14,14 @@ public class Log
         try
         {
             //creating the log file
-            File myObj = new File("/logs/logs.txt");
+            File myObj = new File("/var/logs/logs.txt");
             if (myObj.createNewFile()) {
                 System.out.println("File created: " + myObj.getName());
             } else {
                 System.out.println("File already exists.");
             }
             //opening the file writer
-            fileWriter = new FileWriter("/logs/logs.txt",true);
+            fileWriter = new FileWriter("/var/logs/logs.txt",true);
 
         }
         catch(Exception e)

@@ -1,8 +1,0 @@
-Mon Feb 21 02:24:44 UTC 2022 | User signed up:Alok | USERNAME:N/A
-Mon Feb 21 02:24:53 UTC 2022 | User signed up:LOL | USERNAME:N/A
-Mon Feb 21 02:25:21 UTC 2022 | User logged in:Alok | USERNAME:N/A
-Mon Feb 21 02:25:34 UTC 2022 | User logged in:LOL | USERNAME:N/A
-Mon Feb 21 02:26:02 UTC 2022 | Created order:2022-02-21","Ayush","Gautam","AG","09189393 | USERNAME:LOL
-Mon Feb 21 02:26:13 UTC 2022 | Retrieved order info for:1 | USERNAME:LOL
-Mon Feb 21 02:26:33 UTC 2022 | Deleted order id:1 | USERNAME:LOL
-Mon Feb 21 02:26:33 UTC 2022 | java.lang.Exception: TEST | USERNAME:LOL

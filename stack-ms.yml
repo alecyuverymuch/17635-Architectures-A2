@@ -17,7 +17,7 @@ services:
       MYSQL_REMOTE_HOST: ms_mysql
       MYSQL_REMOTE_PORT: 3306
     volumes:
-      - "./ms_logs:/logs"
+      - "./ms_logs:/var/logs"
 
   create:
     image: ms_create
@@ -35,7 +35,7 @@ services:
       MYSQL_REMOTE_HOST: ms_mysql
       MYSQL_REMOTE_PORT: 3306
     volumes:
-      - "./ms_logs:/logs"
+      - "./ms_logs:/var/logs"
 
   retrieve:
     image: ms_retrieve
@@ -53,7 +53,7 @@ services:
       MYSQL_REMOTE_HOST: ms_mysql
       MYSQL_REMOTE_PORT: 3306
     volumes:
-      - "./ms_logs:/logs"
+      - "./ms_logs:/var/logs"
 
   delete:
     image: ms_delete
@@ -71,7 +71,7 @@ services:
       MYSQL_REMOTE_HOST: ms_mysql
       MYSQL_REMOTE_PORT: 3306
     volumes:
-      - "./ms_logs:/logs"
+      - "./ms_logs:/var/logs"
 
   client:
     image: ms_client
