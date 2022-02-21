@@ -14,8 +14,6 @@ public class DeleteServices extends UnicastRemoteObject implements DeleteService
     static final String USER = "root";
     static final String PASS = Configuration.MYSQL_PASSWORD;
 
-    static FileWriter fileWriter;
-    static Boolean logEnable = true;
     static Log log = null;
 
 
@@ -44,17 +42,12 @@ public class DeleteServices extends UnicastRemoteObject implements DeleteService
 
             //initialize logging
             log = new Log("DeleteServices");
-            fileWriter = log.createLogWriter();
-            //disable logging if the logging initialization failed
-            if(fileWriter == null)
-                logEnable = false;
 
         } catch (Exception e) {
 
             System.out.println("DeleteServices binding err: " + e.getMessage()); 
             e.printStackTrace();
-            if(logEnable)
-                log.writeFile(fileWriter, e.toString(),"N/A");
+            log.writeFile(e.toString(),"N/A");
         } 
 
     } // main
@@ -92,8 +85,7 @@ public class DeleteServices extends UnicastRemoteObject implements DeleteService
             sql = "DELETE FROM orders where order_id=" + orderid;
             stmt.executeUpdate(sql);
 
-            if(logEnable)
-                log.writeFile(fileWriter, "Deleted order id:"+orderid,username);
+            log.writeFile("Deleted order id:"+orderid,username);
 
             stmt.close();
             conn.close();
@@ -103,8 +95,7 @@ public class DeleteServices extends UnicastRemoteObject implements DeleteService
         } catch(Exception e) {
 
             ReturnString = e.toString();
-            if(logEnable)
-                log.writeFile(fileWriter, e.toString(),username);
+            log.writeFile(e.toString(),username);
 
         } 
 

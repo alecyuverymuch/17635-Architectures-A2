@@ -16,8 +16,6 @@ public class AuthServices extends UnicastRemoteObject implements AuthServicesAI 
     static final String PASS = Configuration.MYSQL_PASSWORD;
 
     private static Map<String, UserCredentials> sessions = new HashMap<String, UserCredentials>();
-    static FileWriter fileWriter;
-    static Boolean logEnable = true;
     static Log log = null;
 
     // Do nothing constructor
@@ -46,16 +44,11 @@ public class AuthServices extends UnicastRemoteObject implements AuthServicesAI 
 
             //initialize logging
             log = new Log("AuthServices");
-            fileWriter = log.createLogWriter();
-            //disable logging if the logging initialization failed
-            if(fileWriter == null)
-                logEnable = false;
         } catch (Exception e) {
 
             System.out.println("AuthServices binding err: " + e.getMessage()); 
             e.printStackTrace();
-            if(logEnable)
-                log.writeFile(fileWriter, e.toString(),"N/A");
+            log.writeFile(e.toString(),"N/A");
         } 
 
     } // main
@@ -92,8 +85,7 @@ public class AuthServices extends UnicastRemoteObject implements AuthServicesAI 
 
             stmt.executeUpdate(sql);
 
-            if(logEnable)
-                log.writeFile(fileWriter, "User signed up:"+credentials.getUsername(),"N/A");
+            log.writeFile("User signed up:"+credentials.getUsername(),"N/A");
 
 
             // clean up the environment
@@ -105,8 +97,7 @@ public class AuthServices extends UnicastRemoteObject implements AuthServicesAI 
 
         } catch(Exception e) {
             ReturnString = e.toString();
-            if(logEnable)
-                log.writeFile(fileWriter, e.toString(),"N/A");
+            log.writeFile(e.toString(),"N/A");
         } 
         
         return(ReturnString);
@@ -162,8 +153,7 @@ public class AuthServices extends UnicastRemoteObject implements AuthServicesAI 
                     sessions.put(token, credentials);
                 }
 
-                if(logEnable)
-                    log.writeFile(fileWriter, "User logged in:"+credentials.getUsername(),"N/A");
+                log.writeFile("User logged in:"+credentials.getUsername(),"N/A");
             }
 
             //Clean-up environment
@@ -177,8 +167,7 @@ public class AuthServices extends UnicastRemoteObject implements AuthServicesAI 
         } catch(Exception e) {
             // TODO: Logging
             authenticated = false;
-            if(logEnable)
-                log.writeFile(fileWriter, e.toString(),"N/A");
+            log.writeFile(e.toString(),"N/A");
         } 
 
         return authenticated ? token : null;

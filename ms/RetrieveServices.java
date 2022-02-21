@@ -36,8 +36,6 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
     static final String USER = "root";
     static final String PASS = Configuration.MYSQL_PASSWORD;
 
-    static FileWriter fileWriter;
-    static Boolean logEnable = true;
     static Log log;
 
     // Do nothing constructor
@@ -65,17 +63,12 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
 
             //initialize logging
             log = new Log("RetrieveServices");
-            fileWriter = log.createLogWriter();
-            //disable logging if the logging initialization failed
-            if(fileWriter == null)
-                logEnable = false;
 
         } catch (Exception e) {
 
             System.out.println("RetrieveServices binding err: " + e.getMessage()); 
             e.printStackTrace();
-            if(logEnable)
-                log.writeFile(fileWriter, e.toString(),"N/A");
+            log.writeFile(e.toString(),"N/A");
         } 
 
     } // main
@@ -141,8 +134,7 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
                 ReturnString = ReturnString +"{order_id:"+id+", order_date:"+date+", first_name:"+first+", last_name:"
                                +last+", address:"+address+", phone:"+phone+"}";
 
-                if(logEnable)
-                    log.writeFile(fileWriter, "Retrieved order info for:"+id,username);
+                log.writeFile("Retrieved order info for:"+id,username);
             }
 
             ReturnString = ReturnString +"]";
@@ -158,8 +150,7 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
         } catch(Exception e) {
 
             ReturnString = e.toString();
-            if(logEnable)
-                log.writeFile(fileWriter, e.toString(),username);
+            log.writeFile(e.toString(),username);
         } 
         
         return(ReturnString);
@@ -228,8 +219,7 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
                 ReturnString = ReturnString +"{order_id:"+id+", order_date:"+date+", first_name:"+first+", last_name:"
                                +last+", address:"+address+", phone:"+phone+"}";
 
-                if(logEnable)
-                    log.writeFile(fileWriter, "Retrieved order info for id:"+id,username);
+                log.writeFile("Retrieved order info for id:"+id,username);
             }
 
             ReturnString = ReturnString +"]";
@@ -245,8 +235,7 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
         } catch(Exception e) {
 
             ReturnString = e.toString();
-            if(logEnable)
-                log.writeFile(fileWriter, e.toString(),username);
+            log.writeFile(e.toString(),username);
 
         } 
 
