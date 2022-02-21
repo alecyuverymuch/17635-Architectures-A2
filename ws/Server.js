@@ -29,7 +29,18 @@ var express = require("express");             //express is a Node.js web applica
 var mysql = require("mysql");               //Database
 var bodyParser = require("body-parser");     //Javascript parser utility
 var rest = require("./REST.js");              //REST services/handler module
-var app = express();                         //express instance
+var app  = express();                         //express instance
+const ENDPOINTS = require("./EndpointConfig");
+const aliveUserStore = require('./AliveUserStore');
+
+const UNSECURED_ENDPOINTS = [
+    ENDPOINTS.SIGN_IN,
+    ENDPOINTS.SIGN_UP,
+    ENDPOINTS.EXIT,
+    ENDPOINTS.HEALTH
+].map(p => `/api${p}`);
+
+const USERNAME_HEADER_KEY = 'u-token'; // Header name for the username token
 
 /* Winston setup for logging */
 const winston = require('winston')
@@ -55,6 +66,35 @@ const logger = new winston.createLogger(myWinstonOptions)
 
 logger.info("Starting up server....")
 /* End Winston */
+
+
+/**
+ * 
+ * Verifies whether the user is currently logged in
+ * If the user is not logged in for secured endpoints, then it terminates the api
+ *
+ * @param {Object} req
+ * @param {Object} res
+ * @param {Function} next
+ */
+ function verifyAuthentication(req, res, next) {
+    const url = req.originalUrl.split('?')[0];
+    if (UNSECURED_ENDPOINTS.findIndex((ep) => ep.indexOf(url) === 0) !== -1) {
+        return next();
+    }
+    // Check if token is passed in the header
+    if (!req.headers[USERNAME_HEADER_KEY]) {
+        return res.sendStatus(401);
+    }
+    const username = req.headers[USERNAME_HEADER_KEY];
+    // Check if the user is currently loggedin
+    if (aliveUserStore.isUserAlive(username)) {
+        Object.assign(req, {username});
+        return next();
+    } else {
+        return res.sendStatus(401); // Not authenticated
+    }
+}
 
 // Function definition
 function REST() {
@@ -83,16 +123,17 @@ REST.prototype.connectMysql = function () {
 
 // Here is where we configure express and the body parser so the server
 // process can get parsed URLs. You really shouldn't have to tinker with this.
-
-REST.prototype.configureExpress = function (connection) {
-	var self = this;
-	app.use(bodyParser.urlencoded({ extended: true }));
-	app.use(bodyParser.json());
-	app.use(bodyParser.text());
-	var router = express.Router();
-	app.use('/api', router);
-	var rest_router = new rest(router, connection, logger);
-	self.startServer();
+REST.prototype.configureExpress = function(connection) {
+      var self = this;
+      app.use(bodyParser.urlencoded({ extended: true }));
+      app.use(bodyParser.json());
+      app.use(bodyParser.text());
+      var router = express.Router();
+      // Verify the unrouted
+    //   app.use((err, req, res, next) => verifyAuthentication(err, req, res, next));
+      app.use('/api', verifyAuthentication, router);
+      var rest_router = new rest(router,connection, logger);
+      self.startServer();
 }
 
 // If we get here, we are ready to start the server. Basically a listen() on 

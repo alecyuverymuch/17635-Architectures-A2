@@ -44,10 +44,134 @@ public class OrdersUI
 		LocalDate localDate = null;					// Date object
 		WSClientAPI api = new WSClientAPI();	// RESTful api object
 
+		String username = null, password = null;
+		Boolean authenticated = false;
+		UserCredentials sessionCredentials = null;
+		String sessionToken = null;
+
+		while (!authenticated) {
+			System.out.println( "\n\n\n\n" );
+			System.out.println( "Orders Database Login: \n" );
+			System.out.println( "Select an Option: \n" );
+			System.out.println( "1: Sign Up" );
+			System.out.println( "2: Log In" );	
+			System.out.println( "X: Exit\n" );
+			System.out.print( "\n>>>> " );
+			option = keyboard.next().charAt(0);	
+			keyboard.nextLine();
+
+			if ( option == '1' )
+			{
+				System.out.println("Enter Username:");
+				username = keyboard.nextLine();
+
+				System.out.println("Enter Password:");
+				password = keyboard.nextLine();
+		
+				System.out.println("Creating the following user:");
+				System.out.println("==============================");
+				System.out.println(" Username:" + username);		
+				System.out.println(" Password:" + password);
+				System.out.println("==============================");					
+				System.out.println("\nPress 'y' to create this user:");
+
+				option = keyboard.next().charAt(0);
+
+				if (( option == 'y') || (option == 'Y'))
+				{
+					try
+					{
+						System.out.println("\nCreating user...");
+						UserCredentials newUser = new UserCredentials(username, password);
+						response = api.signUp(newUser);
+						System.out.println(response);
+					} catch(Exception e) {
+
+						System.out.println("Request failed:: " + e);
+
+					}
+
+				} else {
+
+					System.out.println("\nUser not created...");
+				}
+
+				System.out.println("\nPress enter to continue..." );
+				c.readLine();
+
+				option = ' '; //Clearing option. This incase the user enterd X/x the program will not exit.
+				username = null;
+				password = null;
+			} // if
+
+			if ( option == '2' )
+			{
+				System.out.println("Enter Username:");
+				username = keyboard.nextLine();
+
+				System.out.println("Enter Password:");
+				password = keyboard.nextLine();
+		
+				System.out.println("Log in as user:");
+				System.out.println("==============================");
+				System.out.println(" Username:" + username);		
+				System.out.println(" Password:" + password);
+				System.out.println("==============================");					
+				System.out.println("\nPress 'y' to log in as this user:");
+
+				option = keyboard.next().charAt(0);
+
+				if (( option == 'y') || (option == 'Y'))
+				{
+					try
+					{
+						System.out.println("\nLoging in...");
+						UserCredentials user = new UserCredentials(username, password);
+						sessionToken = api.signIn(user);
+						if (sessionToken != null) 
+						{	
+							System.out.println("Authentication Successful:");
+							authenticated = true;
+						}
+						else
+						{
+							System.out.println("Authentication Failed:");
+						}
+
+					} catch(Exception e) {
+
+						System.out.println("Request failed:: " + e);
+
+					}
+
+				} else {
+
+					System.out.println("\nLogin canceled...");
+				}
+
+				System.out.println("\nPress enter to continue..." );
+				c.readLine();
+
+				option = ' '; //Clearing option. This incase the user enterd X/x the program will not exit.
+				username = null;
+				password = null;
+			} // if
+
+			if ( ( option == 'X' ) || ( option == 'x' ))
+			{
+				// Here the user is done, so we set the Done flag and halt the system
+				sessionCredentials = null;
+				authenticated = false;
+				
+				System.out.println( "\nDone...\n\n" );
+				break;
+			} // if
+		}
+
 		/////////////////////////////////////////////////////////////////////////////////
 		// Main UI loop
 		/////////////////////////////////////////////////////////////////////////////////
-
+		if(authenticated){
 		while (!done)
 		{	
 			// Here, is the main menu set of choices
@@ -74,7 +198,7 @@ public class OrdersUI
 				System.out.println( "\nRetrieving All Orders::" );
 				try
 				{
-					response = api.retrieveOrders();
+					response = api.retrieveOrders(sessionToken);
 					System.out.println(response);
 
 				} catch (Exception e) {
@@ -116,7 +240,7 @@ public class OrdersUI
 
 				try
 				{
-					response = api.retrieveOrders(orderid);
+					response = api.retrieveOrders(orderid, sessionToken);
 					System.out.println(response);
 
 				} catch (Exception e) {
@@ -169,7 +293,7 @@ public class OrdersUI
 					try
 					{
 						System.out.println("\nCreating order...");
-						response = api.newOrder(date, first, last, address, phone);
+						response = api.newOrder(date, first, last, address, phone, sessionToken);
 						System.out.println(response);
 
 					} catch(Exception e) {
@@ -216,7 +340,7 @@ public class OrdersUI
 
 				try
 				{
-					response = api.deleteOrder(orderid);
+					response = api.deleteOrder(orderid, sessionToken);
 					System.out.println(response);
 
 				} catch (Exception e) {
@@ -235,14 +359,20 @@ public class OrdersUI
 			if ( ( option == 'X' ) || ( option == 'x' ))
 			{
 				// Here the user is done, so we set the Done flag and halt the system
-
-				done = true;
-				System.out.println( "\nDone...\n\n" );
+				try {
+					done = true;
+					System.out.println( "\nDone...\n\n" );
+					api.exit(sessionToken);
+				} catch (Exception e) {
+					System.out.println("Exception while exiting" + e);
+				} finally {
+					sessionToken = null;
+				}
 
 			} // if
 
 		} // while
-
+	}
   	} // main
 
 } // OrdersUI

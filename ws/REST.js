@@ -26,6 +26,8 @@
 ******************************************************************************************************************/
 
 var mysql = require("mysql");     //Database
+const aliveUserStore = require('./AliveUserStore');
+const ENDPOINTS = require("./EndpointConfig");
 
 function REST_ROUTER(router, connection, logger) {
     var self = this;
@@ -46,9 +48,10 @@ REST_ROUTER.prototype.handleRoutes = function (router, connection, logger) {
     });
 
     // GET for /orders specifier - returns all orders currently stored in the database
-    // req parameter is the request object
-    // res parameter is the response object  
-    router.get("/orders", function (req, res) {
+    // req paramdter is the request object
+    // res parameter is the response object
+  
+    router.get(ENDPOINTS.GET_ORDER_ALL,function(req,res){
         logger.info("Getting all database entries...");
         var query = "SELECT * FROM ??";
         var table = ["orders"];
@@ -65,7 +68,8 @@ REST_ROUTER.prototype.handleRoutes = function (router, connection, logger) {
     // GET for /orders/order id specifier - returns the order for the provided order ID
     // req paramdter is the request object
     // res parameter is the response object
-    router.get("/orders/:order_id", function (req, res) {
+     
+    router.get(ENDPOINTS.GET_ORDER_BY_ID,function(req,res){
         logger.info("Getting order ID: %s", req.params.order_id);
         var query = "SELECT * FROM ?? WHERE ??=?";
         var table = ["orders", "order_id", req.params.order_id];
@@ -83,7 +87,8 @@ REST_ROUTER.prototype.handleRoutes = function (router, connection, logger) {
     // POST for /orders?order_date&first_name&last_name&address&phone - adds order
     // req paramdter is the request object - note to get parameters (eg. stuff afer the '?') you must use req.body.param
     // res parameter is the response object 
-    router.post("/orders", function (req, res) {
+  
+    router.post(ENDPOINTS.POST_ORDER,function(req,res){
         logger.info("Adding to orders table Order Date: %s, First Name: %s, Last Name: %s, Address: %s,Phone: %s", req.body.order_date, req.body.first_name, req.body.last_name, req.body.address, req.body.phone);
         var query = "INSERT INTO ??(??,??,??,??,??) VALUES (?,?,?,?,?)";
         var table = ["orders", "order_date", "first_name", "last_name", "address", "phone", req.body.order_date, req.body.first_name, req.body.last_name, req.body.address, req.body.phone];
@@ -101,8 +106,8 @@ REST_ROUTER.prototype.handleRoutes = function (router, connection, logger) {
     // req paramdter is the request object
     // res parameter is the response object
 
-    router.delete("/orders/:order_id",function(req,res){
-        console.log("Deleting order ID: ", req.params.order_id);
+    router.delete(ENDPOINTS.DELETE_ORDER_BY_ID,function(req,res){
+        logger.info("Deleting order ID: %s", req.params.order_id);
         var query = "DELETE FROM ?? WHERE ??=?";
         var table = ["orders","order_id",req.params.order_id];
         query = mysql.format(query,table);
@@ -113,6 +118,50 @@ REST_ROUTER.prototype.handleRoutes = function (router, connection, logger) {
                 res.json({"Error" : false});
             }
         });
+    });
+
+    router.post(ENDPOINTS.SIGN_UP,function(req,res){
+        logger.info("Signing the user up");
+        var query = "INSERT INTO ??(??,??) VALUES (?,?)";
+        var table = ["users","user_name","password",req.body.user_name,req.body.password];
+        query = mysql.format(query,table);
+        connection.query(query,function(err,rows){
+            if(err) {
+                logger.error(err);
+                res.json({"Error" : true, "Message" : "Error executing MySQL query"});
+            } else {
+                res.json({"Error" : false, "Message" : "User Signed Up !"});
+            }
+        });
+    });
+
+    router.post(ENDPOINTS.SIGN_IN,function(req,res){
+        logger.info("Signing in user");
+        var query = "SELECT * FROM ?? WHERE ??=? AND ??=?";
+        var table = ["users","user_name",req.body.user_name,"password",req.body.password];
+        query = mysql.format(query,table);
+        connection.query(query,function(err,rows){
+            if(err) {
+                res.json({"Error" : true, "Message" : "Error executing MySQL query"});
+            } else {
+                /**
+                 * Verify...
+                 */
+                if(rows.length>0){
+                    const username = rows[0]['user_name'];
+                    aliveUserStore.addAliveUser(username);
+                    res.send(username);
+                }
+                else{
+                    res.sendStatus(401);
+                }
+            }
+        });
+    });
+
+    router.post(ENDPOINTS.EXIT,function(req,res){
+        aliveUserStore.removeAliveUser(req.username);
+        res.sendStatus(200);
     });
 }
 

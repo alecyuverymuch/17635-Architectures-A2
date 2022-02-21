@@ -38,7 +38,7 @@ public class WSClientAPI
 	* Returns: String of all the current orders in the orderinfo database
 	********************************************************************************/
 
-	public String retrieveOrders() throws Exception
+	public String retrieveOrders(String authToken) throws Exception
 	{
 		// Set up the URL and connect to the node server
 
@@ -46,6 +46,7 @@ public class WSClientAPI
 
 		URL obj = new URL(url);
 		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+		con.setRequestProperty("u-token", authToken);
 
 		//Form the request header and instantiate the response code
 		con.setRequestMethod("GET");
@@ -77,12 +78,13 @@ public class WSClientAPI
 	*		   orderinfo database.
 	********************************************************************************/
 
-	public String retrieveOrders(String id) throws Exception
+	public String retrieveOrders(String id, String authToken) throws Exception
 	{
 		// Set up the URL and connect to the node server
 		String url = "http://localhost:3000/api/orders/"+id;
 		URL obj = new URL(url);
 		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+		con.setRequestProperty("u-token", authToken);
 
 		//Form the request header and instantiate the response code
 		con.setRequestMethod("GET");
@@ -112,7 +114,8 @@ public class WSClientAPI
 	* Returns: String that contains the status of the POST operation
 	********************************************************************************/
 
-   	public String newOrder(String Date, String FirstName, String LastName, String Address, String Phone) throws Exception
+   	public String newOrder(String Date, String FirstName, String LastName, String Address, String Phone,
+	   String authToken) throws Exception
 	{
 		// Set up the URL and connect to the node server		
 		URL url = new URL("http://localhost:3000/api/orders");
@@ -120,6 +123,81 @@ public class WSClientAPI
 
 		// The POST parameters
 		String input = "order_date="+Date+"&first_name="+FirstName+"&last_name="+LastName+"&address="+Address+"&phone="+Phone;
+
+		//Configure the POST connection for the parameters
+		conn.setRequestMethod("POST");
+        conn.setRequestProperty("Accept-Language", "en-GB,en;q=0.5");
+        conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+        conn.setRequestProperty("Content-length", Integer.toString(input.length()));
+        conn.setRequestProperty("Content-Language", "en-GB");
+        conn.setRequestProperty("charset", "utf-8");
+		conn.setRequestProperty("u-token", authToken);
+        conn.setUseCaches(false);
+        conn.setDoOutput(true);
+
+        // Set up a stream and write the parameters to the server
+		OutputStream os = conn.getOutputStream();
+		os.write(input.getBytes());
+		os.flush();
+
+		//Loop through the input and build the response string.
+		//When done, close the stream.	
+		BufferedReader in = new BufferedReader(new InputStreamReader((conn.getInputStream())));
+		String inputLine;		
+		StringBuffer response = new StringBuffer();
+
+		//Loop through the input and build the response string.
+		//When done, close the stream.		
+
+		while ((inputLine = in.readLine()) != null) 
+		{
+			response.append(inputLine);
+		}
+		
+		in.close();
+		conn.disconnect();
+
+		return(response.toString());
+		
+    } // newOrder
+
+	public String deleteOrder(String id, String authToken) throws Exception 
+	{
+		// Set up the URL and connect to the node server
+		String url = "http://localhost:3000/api/orders/"+id;
+		URL obj = new URL(url);
+		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+		con.setRequestProperty("u-token", authToken);
+
+		//Form the request header and instantiate the response code
+		con.setRequestMethod("DELETE");
+		int responseCode = con.getResponseCode();
+
+		//Set up a buffer to read the response from the server
+		BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+		String inputLine;
+		StringBuffer response = new StringBuffer();
+
+		//Loop through the input and build the response string.
+		//When done, close the stream.		
+
+		while ((inputLine = in.readLine()) != null) 
+		{
+			response.append(inputLine);
+		}
+		in.close();
+
+		return(response.toString());
+	}
+
+	public String signUp(UserCredentials credentials) throws Exception
+	{
+		// Set up the URL and connect to the node server		
+		URL url = new URL("http://localhost:3000/api/signUp");
+		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+
+		// The POST parameters
+		String input = "user_name="+credentials.getUsername()+"&password="+credentials.getPassword();
 
 		//Configure the POST connection for the parameters
 		conn.setRequestMethod("POST");
@@ -154,23 +232,36 @@ public class WSClientAPI
 		conn.disconnect();
 
 		return(response.toString());
-		
-    } // newOrder
+	}
 
-	public String deleteOrder(String id) throws Exception 
+	public String signIn(UserCredentials credentials) throws Exception
 	{
-		// Set up the URL and connect to the node server
-		String url = "http://localhost:3000/api/orders/"+id;
-		URL obj = new URL(url);
-		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+		// Set up the URL and connect to the node server		
+		URL url = new URL("http://localhost:3000/api/signIn");
+		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
-		//Form the request header and instantiate the response code
-		con.setRequestMethod("DELETE");
-		int responseCode = con.getResponseCode();
+		// The POST parameters
+		String input = "user_name="+credentials.getUsername()+"&password="+credentials.getPassword();
 
-		//Set up a buffer to read the response from the server
-		BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-		String inputLine;
+		//Configure the POST connection for the parameters
+		conn.setRequestMethod("POST");
+        conn.setRequestProperty("Accept-Language", "en-GB,en;q=0.5");
+        conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+        conn.setRequestProperty("Content-length", Integer.toString(input.length()));
+        conn.setRequestProperty("Content-Language", "en-GB");
+        conn.setRequestProperty("charset", "utf-8");
+        conn.setUseCaches(false);
+        conn.setDoOutput(true);
+
+        // Set up a stream and write the parameters to the server
+		OutputStream os = conn.getOutputStream();
+		os.write(input.getBytes());
+		os.flush();
+
+		//Loop through the input and build the response string.
+		//When done, close the stream.	
+		BufferedReader in = new BufferedReader(new InputStreamReader((conn.getInputStream())));
+		String inputLine;		
 		StringBuffer response = new StringBuffer();
 
 		//Loop through the input and build the response string.
@@ -180,9 +271,47 @@ public class WSClientAPI
 		{
 			response.append(inputLine);
 		}
+		
 		in.close();
+		conn.disconnect();
 
-		return(response.toString());
+		return (response.toString());
+	}
+
+	public void exit(String authToken) throws Exception
+	{
+		// Set up the URL and connect to the node server		
+		URL url = new URL("http://localhost:3000/api/exit");
+		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+		conn.setRequestProperty("u-token", authToken);
+
+		//Configure the POST connection for the parameters
+		conn.setRequestMethod("POST");
+        conn.setRequestProperty("Accept-Language", "en-GB,en;q=0.5");
+        conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+        conn.setRequestProperty("Content-Language", "en-GB");
+        conn.setRequestProperty("charset", "utf-8");
+        conn.setUseCaches(false);
+        conn.setDoOutput(true);
+
+		//Loop through the input and build the response string.
+		//When done, close the stream.	
+		BufferedReader in = new BufferedReader(new InputStreamReader((conn.getInputStream())));
+		String inputLine;		
+		StringBuffer response = new StringBuffer();
+
+		//Loop through the input and build the response string.
+		//When done, close the stream.		
+
+		while ((inputLine = in.readLine()) != null) 
+		{
+			response.append(inputLine);
+		}
+
+		System.out.println("Response received " + response);
+		
+		in.close();
+		conn.disconnect();
 	}
 	
 } // WSClientAPI

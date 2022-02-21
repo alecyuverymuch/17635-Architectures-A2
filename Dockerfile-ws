@@ -10,6 +10,8 @@ RUN npm -y init
 COPY ws/REST.js ws/
 COPY ws/Server.js ws/
 COPY ws/config ws/config
+COPY ws/EndpointConfig.js ws/
+COPY ws/AliveUserStore.js ws/
 WORKDIR /usr/app/ws
 RUN sed "s/<PASSWORD>/${MYSQL_PASSWORD}/g" > config/mysql.config.json < config/mysql.config.json-tmplt
 RUN mv ../package.json .
