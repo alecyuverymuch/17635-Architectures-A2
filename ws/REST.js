@@ -89,8 +89,6 @@ REST_ROUTER.prototype.handleRoutes = function (router, connection, logger) {
     // res parameter is the response object 
   
     router.post(ENDPOINTS.POST_ORDER,function(req,res){
-        //console.log("url:", req.url);
-        //console.log("body:", req.body);
         logger.info("Adding to orders table Order Date: %s, First Name: %s, Last Name: %s, Address: %s,Phone: %s", req.body.order_date, req.body.first_name, req.body.last_name, req.body.address, req.body.phone);
         var query = "INSERT INTO ??(??,??,??,??,??) VALUES (?,?,?,?,?)";
         var table = ["orders", "order_date", "first_name", "last_name", "address", "phone", req.body.order_date, req.body.first_name, req.body.last_name, req.body.address, req.body.phone];
@@ -109,7 +107,7 @@ REST_ROUTER.prototype.handleRoutes = function (router, connection, logger) {
     // res parameter is the response object
 
     router.delete(ENDPOINTS.DELETE_ORDER_BY_ID,function(req,res){
-        console.log("Deleting order ID: ", req.params.order_id);
+        logger.info("Deleting order ID: %s", req.params.order_id);
         var query = "DELETE FROM ?? WHERE ??=?";
         var table = ["orders","order_id",req.params.order_id];
         query = mysql.format(query,table);
@@ -123,13 +121,13 @@ REST_ROUTER.prototype.handleRoutes = function (router, connection, logger) {
     });
 
     router.post(ENDPOINTS.SIGN_UP,function(req,res){
-        console.log("Signing the user up");
+        logger.info("Signing the user up");
         var query = "INSERT INTO ??(??,??) VALUES (?,?)";
         var table = ["users","user_name","password",req.body.user_name,req.body.password];
         query = mysql.format(query,table);
         connection.query(query,function(err,rows){
             if(err) {
-                console.log(err);
+                logger.error(err);
                 res.json({"Error" : true, "Message" : "Error executing MySQL query"});
             } else {
                 res.json({"Error" : false, "Message" : "User Signed Up !"});
@@ -138,7 +136,7 @@ REST_ROUTER.prototype.handleRoutes = function (router, connection, logger) {
     });
 
     router.post(ENDPOINTS.SIGN_IN,function(req,res){
-        console.log("Signing in user");
+        logger.info("Signing in user");
         var query = "SELECT * FROM ?? WHERE ??=? AND ??=?";
         var table = ["users","user_name",req.body.user_name,"password",req.body.password];
         query = mysql.format(query,table);
