@@ -52,12 +52,14 @@ REST_ROUTER.prototype.handleRoutes = function (router, connection, logger) {
     // res parameter is the response object
   
     router.get(ENDPOINTS.GET_ORDER_ALL,function(req,res){
-        logger.info("Getting all database entries...");
+        logger.info("[USER: %s] Getting all orders", req.username);
         var query = "SELECT * FROM ??";
         var table = ["orders"];
         query = mysql.format(query, table);
         connection.query(query, function (err, rows) {
             if (err) {
+                logger.error(err);
+                res.sendStatus(500);
                 res.json({ "Error": true, "Message": "Error executing MySQL query" });
             } else {
                 res.json({ "Error": false, "Message": "Success", "Orders": rows });
@@ -70,16 +72,17 @@ REST_ROUTER.prototype.handleRoutes = function (router, connection, logger) {
     // res parameter is the response object
      
     router.get(ENDPOINTS.GET_ORDER_BY_ID,function(req,res){
-        logger.info("Getting order ID: %s", req.params.order_id);
+        logger.info("[USER: %s] Getting order ID: %s", req.username, req.params.order_id);
         var query = "SELECT * FROM ?? WHERE ??=?";
         var table = ["orders", "order_id", req.params.order_id];
         query = mysql.format(query, table);
         connection.query(query, function (err, rows) {
             if (err) {
                 logger.error(err);
+                res.sendStatus(500);
                 res.json({ "Error": true, "Message": "Error executing MySQL query" });
             } else {
-                res.json({ "Error": false, "Message": "Success", "Users": rows });
+                res.json({ "Error": false, "Message": "Success", "Orders": rows });
             }
         });
     });
@@ -87,17 +90,26 @@ REST_ROUTER.prototype.handleRoutes = function (router, connection, logger) {
     // POST for /orders?order_date&first_name&last_name&address&phone - adds order
     // req paramdter is the request object - note to get parameters (eg. stuff afer the '?') you must use req.body.param
     // res parameter is the response object 
-  
     router.post(ENDPOINTS.POST_ORDER,function(req,res){
-        logger.info("Adding to orders table Order Date: %s, First Name: %s, Last Name: %s, Address: %s,Phone: %s", req.body.order_date, req.body.first_name, req.body.last_name, req.body.address, req.body.phone);
+        logger.info("[USER: %s] Creating a new order", req.username);
+        logger.info(
+            "Adding to orders table Order Date: %s, First Name: %s, Last Name: %s, Address: %s,Phone: %s",
+            req.body.order_date,
+            req.body.first_name,
+            req.body.last_name,
+            req.body.address,
+            req.body.phone
+        );
         var query = "INSERT INTO ??(??,??,??,??,??) VALUES (?,?,?,?,?)";
         var table = ["orders", "order_date", "first_name", "last_name", "address", "phone", req.body.order_date, req.body.first_name, req.body.last_name, req.body.address, req.body.phone];
         query = mysql.format(query, table);
         connection.query(query, function (err, rows) {
             if (err) {
+                logger.error(err);
+                res.sendStatus(500);
                 res.json({ "Error": true, "Message": "Error executing MySQL query" });
             } else {
-                res.json({ "Error": false, "Message": "User Added !" });
+                res.json({ "Error": false, "Message": "Order created!" });
             }
         });
     });
@@ -107,12 +119,14 @@ REST_ROUTER.prototype.handleRoutes = function (router, connection, logger) {
     // res parameter is the response object
 
     router.delete(ENDPOINTS.DELETE_ORDER_BY_ID,function(req,res){
-        logger.info("Deleting order ID: %s", req.params.order_id);
+        logger.info("[USER: %s] Deleting order ID: %s", req.username, req.params.order_id);
         var query = "DELETE FROM ?? WHERE ??=?";
         var table = ["orders","order_id",req.params.order_id];
         query = mysql.format(query,table);
         connection.query(query,function(err,rows){
             if(err) {
+                logger.error(err);
+                res.sendStatus(500);
                 res.json({"Error" : true, "Message" : "Error executing MySQL query"});
             } else {
                 res.json({"Error" : false});
@@ -121,13 +135,14 @@ REST_ROUTER.prototype.handleRoutes = function (router, connection, logger) {
     });
 
     router.post(ENDPOINTS.SIGN_UP,function(req,res){
-        logger.info("Signing the user up");
+        logger.info("Signing up a new user");
         var query = "INSERT INTO ??(??,??) VALUES (?,?)";
         var table = ["users","user_name","password",req.body.user_name,req.body.password];
         query = mysql.format(query,table);
         connection.query(query,function(err,rows){
             if(err) {
                 logger.error(err);
+                res.sendStatus(500);
                 res.json({"Error" : true, "Message" : "Error executing MySQL query"});
             } else {
                 res.json({"Error" : false, "Message" : "User Signed Up !"});
@@ -136,12 +151,14 @@ REST_ROUTER.prototype.handleRoutes = function (router, connection, logger) {
     });
 
     router.post(ENDPOINTS.SIGN_IN,function(req,res){
-        logger.info("Signing in user");
         var query = "SELECT * FROM ?? WHERE ??=? AND ??=?";
         var table = ["users","user_name",req.body.user_name,"password",req.body.password];
+        logger.info("[USER: %s] Trying to sign in", req.body.user_name);
         query = mysql.format(query,table);
         connection.query(query,function(err,rows){
             if(err) {
+                logger.error(err);
+                res.sendStatus(500);
                 res.json({"Error" : true, "Message" : "Error executing MySQL query"});
             } else {
                 /**
@@ -153,6 +170,7 @@ REST_ROUTER.prototype.handleRoutes = function (router, connection, logger) {
                     res.send(username);
                 }
                 else{
+                    logger.error("[USER: %s] Not found. Sending 401", req.body.user_name);
                     res.sendStatus(401);
                 }
             }
