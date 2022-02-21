@@ -31,16 +31,16 @@ var bodyParser  = require("body-parser");     //Javascript parser utility
 var rest = require("./REST.js");              //REST services/handler module
 var app  = express();                         //express instance
 const ENDPOINTS = require("./EndpointConfig");
+const aliveUserStore = require('./AliveUserStore');
 
 const UNSECURED_ENDPOINTS = [
     ENDPOINTS.SIGN_IN,
     ENDPOINTS.SIGN_UP,
     ENDPOINTS.EXIT,
     ENDPOINTS.HEALTH
-];
+].map(p => `/api${p}`);
 
 const USERNAME_HEADER_KEY = 'u-token'; // Header name for the username token
-const allActiveUsers = new Set(); // Stores the usernames of all the active users
 
 /**
  * 
@@ -52,7 +52,8 @@ const allActiveUsers = new Set(); // Stores the usernames of all the active user
  * @param {Function} next
  */
 function verifyAuthentication(req, res, next) {
-    if (UNSECURED_ENDPOINTS.findIndex((ep) => req.originalUrl.indexOf(ep) >= 0) !== -1) {
+    const url = req.originalUrl.split('?')[0];
+    if (UNSECURED_ENDPOINTS.findIndex((ep) => ep.indexOf(url) === 0) !== -1) {
         return next();
     }
     // Check if token is passed in the header
@@ -61,7 +62,7 @@ function verifyAuthentication(req, res, next) {
     }
     const username = req.headers[USERNAME_HEADER_KEY];
     // Check if the user is currently loggedin
-    if (allActiveUsers.has(username)) {
+    if (aliveUserStore.isUserAlive(username)) {
         Object.assign(req, {username});
         return next();
     } else {
@@ -107,7 +108,7 @@ REST.prototype.configureExpress = function(connection) {
       // Verify the unrouted
     //   app.use((err, req, res, next) => verifyAuthentication(err, req, res, next));
       app.use('/api', verifyAuthentication, router);
-      var rest_router = new rest(router,connection, allActiveUsers);
+      var rest_router = new rest(router,connection);
       self.startServer();
 }
 

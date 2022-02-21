@@ -26,17 +26,18 @@
 ******************************************************************************************************************/
 
 var mysql = require("mysql");     //Database
+const aliveUserStore = require('./AliveUserStore');
 const ENDPOINTS = require("./EndpointConfig");
 
-function REST_ROUTER(router,connection, allActiveUsers) {
+function REST_ROUTER(router,connection) {
     var self = this;
-    self.handleRoutes(router,connection, allActiveUsers);
+    self.handleRoutes(router,connection);
 }
 
 // Here is where we define the routes. Essentially a route is a path taken through the code dependent upon the 
 // contents of the URL
 
-REST_ROUTER.prototype.handleRoutes= function(router,connection, allActiveUsers) {
+REST_ROUTER.prototype.handleRoutes= function(router,connection) {
 
     // GET with no specifier - returns system version information
     // req paramdter is the request object
@@ -152,14 +153,14 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection, allActiveUsers) 
                     res.json(req.username);
                 }
                 else{
-                    res.json(false);
+                    res.sendStatus(401);
                 }
             }
         });
     });
 
     router.post(ENDPOINTS.EXIT,function(req,res){
-        allActiveUsers.delete(req.username);
+        aliveUserStore.removeAliveUser(req.username);
         res.sendStatus(200);
     });
 }
