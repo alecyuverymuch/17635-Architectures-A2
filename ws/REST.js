@@ -150,7 +150,9 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection) {
                  * Verify...
                  */
                 if(rows.length>0){
-                    res.json(req.username);
+                    const username = rows[0]['user_name'];
+                    aliveUserStore.addAliveUser(username);
+                    res.send(username);
                 }
                 else{
                     res.sendStatus(401);
