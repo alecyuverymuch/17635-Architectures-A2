@@ -1,7 +1,9 @@
 import java.rmi.RemoteException; 
 import java.rmi.server.UnicastRemoteObject;
 import java.rmi.registry.Registry;
+import java.security.MessageDigest;
 import java.sql.*;
+import java.util.*;
 
 public class AuthServices extends UnicastRemoteObject implements AuthServicesAI {
     // Set up the JDBC driver name and database URL
@@ -11,6 +13,8 @@ public class AuthServices extends UnicastRemoteObject implements AuthServicesAI 
     // Set up the orderinfo database credentials
     static final String USER = "root";
     static final String PASS = Configuration.MYSQL_PASSWORD;
+
+    private static Map<String, UserCredentials> sessions = new HashMap<String, UserCredentials>();
 
     // Do nothing constructor
     public AuthServices() throws RemoteException {}
@@ -44,7 +48,7 @@ public class AuthServices extends UnicastRemoteObject implements AuthServicesAI 
 
     } // main
 
-    public String CreateUser(UserCredentials credentials) throws RemoteException 
+    public String createUser(UserCredentials credentials) throws RemoteException 
     {
         // Local declarations
 
@@ -91,12 +95,13 @@ public class AuthServices extends UnicastRemoteObject implements AuthServicesAI 
 
     }
 
-    public Boolean AuthenticateUser(UserCredentials credentials) throws RemoteException 
+    public String authenticateUser(UserCredentials credentials) throws RemoteException 
     {
         // Local declarations
         Connection conn = null;		// connection to the orderinfo database
         Statement stmt = null;		// A Statement object is an interface that represents a SQL statement.
         Boolean authenticated = false;	// Return boolean. True when authenticated
+        String token = null;
 
         try
         {
@@ -133,7 +138,11 @@ public class AuthServices extends UnicastRemoteObject implements AuthServicesAI 
                 String password = rs.getString("password");
 
                 if (password.equals(credentials.getPassword()))
+                {
                     authenticated = true;
+                    token = createToken(credentials);
+                    sessions.put(token, credentials);
+                }
             }
 
             //Clean-up environment
@@ -145,10 +154,32 @@ public class AuthServices extends UnicastRemoteObject implements AuthServicesAI 
             conn.close();
 
         } catch(Exception e) {
-            System.out.println("AuthServices err: " + e.getMessage());
+            // TODO: Logging
             authenticated = false;
         } 
 
-        return(authenticated);
+        return authenticated ? token : null;
+    }
+
+    public String authenticateToken(String token) throws RemoteException 
+    {
+        if (sessions.containsKey(token))
+            return sessions.get(token).getUsername();
+        
+        return null;
+    }
+
+    public void expireToken(String token) throws RemoteException
+    {
+        if (sessions.containsKey(token))
+            sessions.remove(token);
+    }
+
+    private String createToken(UserCredentials credentials) throws Exception
+    {
+        String sessionString = credentials.getUsername() + credentials.getPassword() + System.currentTimeMillis();
+        MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
+        messageDigest.update(sessionString.getBytes());
+        return new String(messageDigest.digest());
     }
 }

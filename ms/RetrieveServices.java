@@ -38,8 +38,6 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
     // Do nothing constructor
     public RetrieveServices() throws RemoteException {}
 
-    private static AuthServices auth = null;
-
     // Main service loop
     public static void main(String args[]) 
     { 	
@@ -50,7 +48,6 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
         try 
         { 
             RetrieveServices obj = new RetrieveServices();
-            auth = new AuthServices();
 
             Registry registry = Configuration.createRegistry();
             registry.bind("RetrieveServices", obj);
@@ -74,7 +71,7 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
 
     // This method will return all the entries in the orderinfo database
 
-    public String retrieveOrders(UserCredentials credentials) throws RemoteException
+    public String retrieveOrders() throws RemoteException
     {
       	// Local declarations
 
@@ -84,7 +81,6 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
         							// if not you get an error string
         try
         {
-            UserAuthentication(credentials);
             // TODO: Logging Function
 
             // Here we load and initialize the JDBC connector. Essentially a static class
@@ -155,7 +151,7 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
     // This method will returns the order in the orderinfo database corresponding to the id
     // provided in the argument.
 
-    public String retrieveOrders(String orderid, UserCredentials credentials) throws RemoteException
+    public String retrieveOrders(String orderid) throws RemoteException
     {
       	// Local declarations
 
@@ -166,7 +162,6 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
 
         try
         {
-            UserAuthentication(credentials);
             // TODO: Logging Function
             
             // Here we load and initialize the JDBC connector. Essentially a static class
@@ -235,12 +230,4 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
         return(ReturnString);
 
     } //retrieve order by id
-
-    private void UserAuthentication(UserCredentials credentials) throws Exception
-    {
-        Boolean authenticated = auth.AuthenticateUser(credentials);
-        if (!authenticated)
-            throw new Exception("Invalid Credentials");
-    }
-
 } // RetrieveServices

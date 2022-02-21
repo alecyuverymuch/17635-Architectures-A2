@@ -56,7 +56,7 @@ UNLOCK TABLES;
 DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users` (
   `user_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `user_name` varchar(20) DEFAULT NULL,
+  `user_name` varchar(20) UNIQUE DEFAULT NULL,
   `password` varchar(20) DEFAULT NULL,
   PRIMARY KEY (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;

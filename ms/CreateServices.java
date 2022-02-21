@@ -37,8 +37,6 @@ public class CreateServices extends UnicastRemoteObject implements CreateService
     // Do nothing constructor
     public CreateServices() throws RemoteException {}
 
-    private static AuthServices auth = null;
-
     // Main service loop
     public static void main(String args[]) 
     { 	
@@ -49,7 +47,6 @@ public class CreateServices extends UnicastRemoteObject implements CreateService
         try 
         { 
             CreateServices obj = new CreateServices();
-            auth = new AuthServices();
 
             Registry registry = Configuration.createRegistry();
             registry.bind("CreateServices", obj);
@@ -75,7 +72,7 @@ public class CreateServices extends UnicastRemoteObject implements CreateService
 
     // This method add the entry into the ms_orderinfo database
 
-    public String newOrder(String idate, String ifirst, String ilast, String iaddress, String iphone, UserCredentials credentials) throws RemoteException
+    public String newOrder(String idate, String ifirst, String ilast, String iaddress, String iphone) throws RemoteException
     {
       	// Local declarations
 
@@ -85,7 +82,6 @@ public class CreateServices extends UnicastRemoteObject implements CreateService
         							                 // if not you get an error string
         try
         {
-            UserAuthentication(credentials);
             // TODO: Logging function
 
             // Here we load and initialize the JDBC connector. Essentially a static class
@@ -125,12 +121,4 @@ public class CreateServices extends UnicastRemoteObject implements CreateService
         return(ReturnString);
 
     } //retrieve all orders
-
-    private void UserAuthentication(UserCredentials credentials) throws Exception
-    {
-        Boolean authenticated = auth.AuthenticateUser(credentials);
-        if (!authenticated)
-            throw new Exception("Invalid Credentials");
-    }
-
 } // RetrieveServices

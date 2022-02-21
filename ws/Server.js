@@ -26,8 +26,8 @@
 ******************************************************************************************************************/
 var mysqlConfig = require('./config/mysql.config.json')
 var express = require("express");             //express is a Node.js web application framework 
-var mysql   = require("mysql");               //Database
-var bodyParser  = require("body-parser");     //Javascript parser utility
+var mysql = require("mysql");               //Database
+var bodyParser = require("body-parser");     //Javascript parser utility
 var rest = require("./REST.js");              //REST services/handler module
 var app  = express();                         //express instance
 const ENDPOINTS = require("./EndpointConfig");
@@ -42,6 +42,32 @@ const UNSECURED_ENDPOINTS = [
 
 const USERNAME_HEADER_KEY = 'u-token'; // Header name for the username token
 
+/* Winston setup for logging */
+const winston = require('winston')
+const format = winston.format
+const myWinstonOptions = {
+	level: 'info',
+	format: format.combine(
+		format.timestamp({
+			format: 'YYYY-MM-DD HH:mm:ss'
+		}),
+		format.errors({ stack: true }),
+		format.splat(),
+		format.json()
+	),
+	defaultMeta: { service: 'ws-service' },
+	transports: [
+		new winston.transports.Console(),
+		new winston.transports.File({ filename: '/var/logs/ws-server-error.log', level: 'error' }),
+		new winston.transports.File({ filename: '/var/logs/ws-server-combined.log' })
+	]
+}
+const logger = new winston.createLogger(myWinstonOptions)
+
+logger.info("Starting up server....")
+/* End Winston */
+
+
 /**
  * 
  * Verifies whether the user is currently logged in
@@ -51,7 +77,7 @@ const USERNAME_HEADER_KEY = 'u-token'; // Header name for the username token
  * @param {Object} res
  * @param {Function} next
  */
-function verifyAuthentication(req, res, next) {
+ function verifyAuthentication(req, res, next) {
     const url = req.originalUrl.split('?')[0];
     if (UNSECURED_ENDPOINTS.findIndex((ep) => ep.indexOf(url) === 0) !== -1) {
         return next();
@@ -71,9 +97,9 @@ function verifyAuthentication(req, res, next) {
 }
 
 // Function definition
-function REST(){
-    var self = this;
-    self.connectMysql();
+function REST() {
+	var self = this;
+	self.connectMysql();
 };
 
 // Here we connect to the database. Of course you will put your own user and password information 
@@ -81,24 +107,22 @@ function REST(){
 // Note that I hardwared the server to the ws_orderinfo name. You will have to provide your own
 // password... you will probably use the same user. If not, you will have to change that as well.
 
-REST.prototype.connectMysql = function() {
-    var self = this;
-    var pool = mysql.createPool(mysqlConfig);
+REST.prototype.connectMysql = function () {
+	var self = this;
+	var pool = mysql.createPool(mysqlConfig);
 
-    // Here make the connection to the ws_ordersinfo database
-
-    pool.getConnection(function(err,connection) {
-        if(err) {
-          self.stop(err);
-        } else {
-          self.configureExpress(connection);
-        }
-    });
+	// Here make the connection to the ws_ordersinfo database
+	pool.getConnection(function (err, connection) {
+		if (err) {
+			self.stop(err);
+		} else {
+			self.configureExpress(connection);
+		}
+	});
 }
 
 // Here is where we configure express and the body parser so the server
 // process can get parsed URLs. You really shouldn't have to tinker with this.
-
 REST.prototype.configureExpress = function(connection) {
       var self = this;
       app.use(bodyParser.urlencoded({ extended: true }));
@@ -108,7 +132,7 @@ REST.prototype.configureExpress = function(connection) {
       // Verify the unrouted
     //   app.use((err, req, res, next) => verifyAuthentication(err, req, res, next));
       app.use('/api', verifyAuthentication, router);
-      var rest_router = new rest(router,connection);
+      var rest_router = new rest(router,connection, logger);
       self.startServer();
 }
 
@@ -116,17 +140,18 @@ REST.prototype.configureExpress = function(connection) {
 // port 3000. I hardwired it in this example, you can change it if you like.
 // I guess making it a variable would be better (javascript doesn't have #define).
 
-REST.prototype.startServer = function() {
-      app.listen(3000,function(){
-          console.log("Server Started at Port 3000.");
-      });
+REST.prototype.startServer = function () {
+	app.listen(3000, function () {
+		logger.info("Server Started at Port 3000.");
+	});
 }
 
 // We land here if we can't connect to mysql
 
-REST.prototype.stop = function(err) {
-    console.log("Issue connecting with mysql and/or connecting to the database.\n" + err);
-    process.exit(1);
+REST.prototype.stop = function (err) {
+	logger.error(new Error("Issue connecting with mysql and/or connecting to the database.\n"));
+	logger.error(err);
+	process.exit(1);
 }
 
 // Instantiation

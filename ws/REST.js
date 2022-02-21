@@ -29,39 +29,38 @@ var mysql = require("mysql");     //Database
 const aliveUserStore = require('./AliveUserStore');
 const ENDPOINTS = require("./EndpointConfig");
 
-function REST_ROUTER(router,connection) {
+function REST_ROUTER(router, connection, logger) {
     var self = this;
-    self.handleRoutes(router,connection);
+    self.handleRoutes(router, connection, logger);
 }
 
 // Here is where we define the routes. Essentially a route is a path taken through the code dependent upon the 
 // contents of the URL
 
-REST_ROUTER.prototype.handleRoutes= function(router,connection) {
+REST_ROUTER.prototype.handleRoutes = function (router, connection, logger) {
 
     // GET with no specifier - returns system version information
     // req paramdter is the request object
     // res parameter is the response object
 
-    router.get("/",function(req,res){
-        console.log('Health check');
-        res.json({"Message":"Orders Webservices Server Version 1.0"});
+    router.get("/", function (req, res) {
+        res.json({ "Message": "Orders Webservices Server Version 1.0" });
     });
-    
+
     // GET for /orders specifier - returns all orders currently stored in the database
     // req paramdter is the request object
     // res parameter is the response object
   
     router.get(ENDPOINTS.GET_ORDER_ALL,function(req,res){
-        console.log("Getting all database entries..." );
+        logger.info("Getting all database entries...");
         var query = "SELECT * FROM ??";
         var table = ["orders"];
-        query = mysql.format(query,table);
-        connection.query(query,function(err,rows){
-            if(err) {
-                res.json({"Error" : true, "Message" : "Error executing MySQL query"});
+        query = mysql.format(query, table);
+        connection.query(query, function (err, rows) {
+            if (err) {
+                res.json({ "Error": true, "Message": "Error executing MySQL query" });
             } else {
-                res.json({"Error" : false, "Message" : "Success", "Orders" : rows});
+                res.json({ "Error": false, "Message": "Success", "Orders": rows });
             }
         });
     });
@@ -71,15 +70,16 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection) {
     // res parameter is the response object
      
     router.get(ENDPOINTS.GET_ORDER_BY_ID,function(req,res){
-        console.log("Getting order ID: ", req.params.order_id );
+        logger.info("Getting order ID: %s", req.params.order_id);
         var query = "SELECT * FROM ?? WHERE ??=?";
-        var table = ["orders","order_id",req.params.order_id];
-        query = mysql.format(query,table);
-        connection.query(query,function(err,rows){
-            if(err) {
-                res.json({"Error" : true, "Message" : "Error executing MySQL query"});
+        var table = ["orders", "order_id", req.params.order_id];
+        query = mysql.format(query, table);
+        connection.query(query, function (err, rows) {
+            if (err) {
+                logger.error(err);
+                res.json({ "Error": true, "Message": "Error executing MySQL query" });
             } else {
-                res.json({"Error" : false, "Message" : "Success", "Users" : rows});
+                res.json({ "Error": false, "Message": "Success", "Users": rows });
             }
         });
     });
@@ -91,15 +91,15 @@ REST_ROUTER.prototype.handleRoutes= function(router,connection) {
     router.post(ENDPOINTS.POST_ORDER,function(req,res){
         //console.log("url:", req.url);
         //console.log("body:", req.body);
-        console.log("Adding to orders table ", req.body.order_date,",",req.body.first_name,",",req.body.last_name,",",req.body.address,",",req.body.phone);
+        logger.info("Adding to orders table Order Date: %s, First Name: %s, Last Name: %s, Address: %s,Phone: %s", req.body.order_date, req.body.first_name, req.body.last_name, req.body.address, req.body.phone);
         var query = "INSERT INTO ??(??,??,??,??,??) VALUES (?,?,?,?,?)";
-        var table = ["orders","order_date","first_name","last_name","address","phone",req.body.order_date,req.body.first_name,req.body.last_name,req.body.address,req.body.phone];
-        query = mysql.format(query,table);
-        connection.query(query,function(err,rows){
-            if(err) {
-                res.json({"Error" : true, "Message" : "Error executing MySQL query"});
+        var table = ["orders", "order_date", "first_name", "last_name", "address", "phone", req.body.order_date, req.body.first_name, req.body.last_name, req.body.address, req.body.phone];
+        query = mysql.format(query, table);
+        connection.query(query, function (err, rows) {
+            if (err) {
+                res.json({ "Error": true, "Message": "Error executing MySQL query" });
             } else {
-                res.json({"Error" : false, "Message" : "User Added !"});
+                res.json({ "Error": false, "Message": "User Added !" });
             }
         });
     });
