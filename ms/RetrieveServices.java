@@ -20,7 +20,8 @@
 *	= MySQL
 	- orderinfo database 
 ******************************************************************************************************************/
-import java.rmi.RemoteException; 
+import java.io.FileWriter;
+import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.rmi.registry.Registry;
 import java.sql.*;
@@ -34,6 +35,10 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
     // Set up the orderinfo database credentials
     static final String USER = "root";
     static final String PASS = Configuration.MYSQL_PASSWORD;
+
+    static FileWriter fileWriter;
+    static Boolean logEnable = true;
+    static Log log;
 
     // Do nothing constructor
     public RetrieveServices() throws RemoteException {}
@@ -58,10 +63,19 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
                 System.out.println("\t" + name);
             }
 
+            //initialize logging
+            log = new Log();
+            fileWriter = log.createLogWriter();
+            //disable logging if the logging initialization failed
+            if(fileWriter == null)
+                logEnable = false;
+
         } catch (Exception e) {
 
             System.out.println("RetrieveServices binding err: " + e.getMessage()); 
             e.printStackTrace();
+            if(logEnable)
+                log.writeFile(fileWriter, e.toString(),"N/A");
         } 
 
     } // main
@@ -71,7 +85,7 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
 
     // This method will return all the entries in the orderinfo database
 
-    public String retrieveOrders() throws RemoteException
+    public String retrieveOrders(String username) throws RemoteException
     {
       	// Local declarations
 
@@ -127,6 +141,8 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
                 ReturnString = ReturnString +"{order_id:"+id+", order_date:"+date+", first_name:"+first+", last_name:"
                                +last+", address:"+address+", phone:"+phone+"}";
 
+                if(logEnable)
+                    log.writeFile(fileWriter, "Retrieved order info for:"+id,username);
             }
 
             ReturnString = ReturnString +"]";
@@ -142,6 +158,8 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
         } catch(Exception e) {
 
             ReturnString = e.toString();
+            if(logEnable)
+                log.writeFile(fileWriter, e.toString(),username);
         } 
         
         return(ReturnString);
@@ -151,7 +169,7 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
     // This method will returns the order in the orderinfo database corresponding to the id
     // provided in the argument.
 
-    public String retrieveOrders(String orderid) throws RemoteException
+    public String retrieveOrders(String orderid, String username) throws RemoteException
     {
       	// Local declarations
 
@@ -209,6 +227,9 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
 
                 ReturnString = ReturnString +"{order_id:"+id+", order_date:"+date+", first_name:"+first+", last_name:"
                                +last+", address:"+address+", phone:"+phone+"}";
+
+                if(logEnable)
+                    log.writeFile(fileWriter, "Retrieved order info for id:"+id,username);
             }
 
             ReturnString = ReturnString +"]";
@@ -224,6 +245,8 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
         } catch(Exception e) {
 
             ReturnString = e.toString();
+            if(logEnable)
+                log.writeFile(fileWriter, e.toString(),username);
 
         } 
 

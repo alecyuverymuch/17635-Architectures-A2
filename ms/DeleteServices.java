@@ -1,4 +1,5 @@
-import java.rmi.RemoteException; 
+import java.io.FileWriter;
+import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.rmi.registry.Registry;
 import java.sql.*;
@@ -12,6 +13,11 @@ public class DeleteServices extends UnicastRemoteObject implements DeleteService
     // Set up the orderinfo database credentials
     static final String USER = "root";
     static final String PASS = Configuration.MYSQL_PASSWORD;
+
+    static FileWriter fileWriter;
+    static Boolean logEnable = true;
+    static Log log = null;
+
 
     // Do nothing constructor
     public DeleteServices() throws RemoteException {}
@@ -36,15 +42,24 @@ public class DeleteServices extends UnicastRemoteObject implements DeleteService
                 System.out.println("\t" + name);
             }
 
+            //initialize logging
+            log = new Log();
+            fileWriter = log.createLogWriter();
+            //disable logging if the logging initialization failed
+            if(fileWriter == null)
+                logEnable = false;
+
         } catch (Exception e) {
 
             System.out.println("DeleteServices binding err: " + e.getMessage()); 
             e.printStackTrace();
+            if(logEnable)
+                log.writeFile(fileWriter, e.toString(),"N/A");
         } 
 
     } // main
 
-    public String deleteOrder(String orderid) throws RemoteException
+    public String deleteOrder(String orderid, String username) throws RemoteException
     {
       	// Local declarations
 
@@ -77,6 +92,9 @@ public class DeleteServices extends UnicastRemoteObject implements DeleteService
             sql = "DELETE FROM orders where order_id=" + orderid;
             stmt.executeUpdate(sql);
 
+            if(logEnable)
+                log.writeFile(fileWriter, "Deleted order id:"+orderid,username);
+
             stmt.close();
             conn.close();
             stmt.close(); 
@@ -85,6 +103,8 @@ public class DeleteServices extends UnicastRemoteObject implements DeleteService
         } catch(Exception e) {
 
             ReturnString = e.toString();
+            if(logEnable)
+                log.writeFile(fileWriter, e.toString(),username);
 
         } 
 
