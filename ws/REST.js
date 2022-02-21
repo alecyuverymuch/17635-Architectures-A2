@@ -151,9 +151,9 @@ REST_ROUTER.prototype.handleRoutes = function (router, connection, logger) {
     });
 
     router.post(ENDPOINTS.SIGN_IN,function(req,res){
-        logger.info("[USER: %s] Signing in", req.username);
         var query = "SELECT * FROM ?? WHERE ??=? AND ??=?";
         var table = ["users","user_name",req.body.user_name,"password",req.body.password];
+        logger.info("[USER: %s] Trying to sign in", req.body.user_name);
         query = mysql.format(query,table);
         connection.query(query,function(err,rows){
             if(err) {
@@ -170,6 +170,7 @@ REST_ROUTER.prototype.handleRoutes = function (router, connection, logger) {
                     res.send(username);
                 }
                 else{
+                    logger.error("[USER: %s] Not found. Sending 401", req.body.user_name);
                     res.sendStatus(401);
                 }
             }
