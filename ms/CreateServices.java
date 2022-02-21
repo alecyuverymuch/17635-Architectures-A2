@@ -19,7 +19,8 @@
 *	= MySQL
 	- orderinfo database 
 ******************************************************************************************************************/
-import java.rmi.RemoteException; 
+import java.io.FileWriter;
+import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.rmi.registry.Registry;
 import java.sql.*;
@@ -33,6 +34,9 @@ public class CreateServices extends UnicastRemoteObject implements CreateService
     // Set up the orderinfo database credentials
     static final String USER = "root";
     static final String PASS = Configuration.MYSQL_PASSWORD;
+
+    static Log log = null;
+
 
     // Do nothing constructor
     public CreateServices() throws RemoteException {}
@@ -58,11 +62,13 @@ public class CreateServices extends UnicastRemoteObject implements CreateService
             }
             // Bind this object instance to the name RetrieveServices in the rmiregistry 
             // Naming.rebind("//" + Configuration.getRemoteHost() + ":1099/CreateServices", obj); 
-
+            //initialize logging
+            log = new Log("CreateServices");
         } catch (Exception e) {
 
             System.out.println("CreateServices binding err: " + e.getMessage()); 
             e.printStackTrace();
+            log.writeFile(e.toString(),"N/A");
         } 
 
     } // main
@@ -72,7 +78,7 @@ public class CreateServices extends UnicastRemoteObject implements CreateService
 
     // This method add the entry into the ms_orderinfo database
 
-    public String newOrder(String idate, String ifirst, String ilast, String iaddress, String iphone) throws RemoteException
+    public String newOrder(String idate, String ifirst, String ilast, String iaddress, String iphone, String username) throws RemoteException
     {
       	// Local declarations
 
@@ -106,6 +112,8 @@ public class CreateServices extends UnicastRemoteObject implements CreateService
 
             stmt.executeUpdate(sql);
 
+            log.writeFile("Created order:"+""+idate+"\",\""+ifirst+"\",\""+ilast+"\",\""+iaddress+"\",\""+iphone,username);
+
             // clean up the environment
 
             stmt.close();
@@ -116,6 +124,8 @@ public class CreateServices extends UnicastRemoteObject implements CreateService
         } catch(Exception e) {
 
             ReturnString = e.toString();
+
+            log.writeFile(e.toString(),username);
         } 
         
         return(ReturnString);

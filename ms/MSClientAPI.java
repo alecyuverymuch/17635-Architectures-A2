@@ -112,7 +112,7 @@ public class MSClientAPI
 		// Get the RMI registry
 		Registry reg = LocateRegistry.getRegistry(host, Integer.parseInt(port));
 		RetrieveServicesAI obj = (RetrieveServicesAI )reg.lookup("RetrieveServices");
-		response = obj.retrieveOrders();
+		response = obj.retrieveOrders(user);
 		return response;
 	}
 	
@@ -137,7 +137,7 @@ public class MSClientAPI
 		// Get the RMI registry
 		Registry reg = LocateRegistry.getRegistry(host, Integer.parseInt(port));
 		RetrieveServicesAI obj = (RetrieveServicesAI )reg.lookup("RetrieveServices");
-		response = obj.retrieveOrders(id);
+		response = obj.retrieveOrders(id,user);
 		return(response);
 	}
 
@@ -159,7 +159,7 @@ public class MSClientAPI
 		// Get the RMI registry
 		Registry reg = LocateRegistry.getRegistry(host, Integer.parseInt(port));
 		CreateServicesAI obj = (CreateServicesAI) reg.lookup("CreateServices"); 
-		response = obj.newOrder(Date, FirstName, LastName, Address, Phone);
+		response = obj.newOrder(Date, FirstName, LastName, Address, Phone,user);
 		return(response);	
     }
 
@@ -175,7 +175,7 @@ public class MSClientAPI
 		// Get the RMI registry
 		Registry reg = LocateRegistry.getRegistry(host, Integer.parseInt(port));
 		DeleteServicesAI obj = (DeleteServicesAI)reg.lookup("DeleteServices");
-		response = obj.deleteOrder(id);
+		response = obj.deleteOrder(id,user);
 		return(response);	
 	}
 

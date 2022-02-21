@@ -16,6 +16,8 @@ services:
       RMI_REMOTE_PORT: 1096
       MYSQL_REMOTE_HOST: ms_mysql
       MYSQL_REMOTE_PORT: 3306
+    volumes:
+      - "./ms_logs:/var/logs"
 
   create:
     image: ms_create
@@ -32,6 +34,8 @@ services:
       RMI_REMOTE_PORT: 1099
       MYSQL_REMOTE_HOST: ms_mysql
       MYSQL_REMOTE_PORT: 3306
+    volumes:
+      - "./ms_logs:/var/logs"
 
   retrieve:
     image: ms_retrieve
@@ -47,7 +51,9 @@ services:
       RMI_REMOTE_HOST: ms_retrieve
       RMI_REMOTE_PORT: 1098
       MYSQL_REMOTE_HOST: ms_mysql
-      MYSQL_REMOTE_PORT: 3306     
+      MYSQL_REMOTE_PORT: 3306
+    volumes:
+      - "./ms_logs:/var/logs"
 
   delete:
     image: ms_delete
@@ -63,7 +69,9 @@ services:
       RMI_REMOTE_HOST: ms_delete
       RMI_REMOTE_PORT: 1097
       MYSQL_REMOTE_HOST: ms_mysql
-      MYSQL_REMOTE_PORT: 3306   
+      MYSQL_REMOTE_PORT: 3306
+    volumes:
+      - "./ms_logs:/var/logs"
 
   client:
     image: ms_client
@@ -77,6 +85,7 @@ services:
     environment:
       RMI_REMOTE_HOST: ms_server
       RMI_REMOTE_PORT: 1099
+
 
   mysql:
     image: mysql:5.7
