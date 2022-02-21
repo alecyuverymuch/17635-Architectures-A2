@@ -43,7 +43,7 @@ public class DeleteServices extends UnicastRemoteObject implements DeleteService
             }
 
             //initialize logging
-            log = new Log();
+            log = new Log("DeleteServices");
             fileWriter = log.createLogWriter();
             //disable logging if the logging initialization failed
             if(fileWriter == null)

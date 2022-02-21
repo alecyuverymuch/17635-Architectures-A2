@@ -64,7 +64,7 @@ public class RetrieveServices extends UnicastRemoteObject implements RetrieveSer
             }
 
             //initialize logging
-            log = new Log();
+            log = new Log("RetrieveServices");
             fileWriter = log.createLogWriter();
             //disable logging if the logging initialization failed
             if(fileWriter == null)

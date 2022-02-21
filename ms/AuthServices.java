@@ -45,7 +45,7 @@ public class AuthServices extends UnicastRemoteObject implements AuthServicesAI 
             // Naming.rebind("//" + Configuration.getRemoteHost() + ":1099/CreateServices", obj); 
 
             //initialize logging
-            log = new Log();
+            log = new Log("AuthServices");
             fileWriter = log.createLogWriter();
             //disable logging if the logging initialization failed
             if(fileWriter == null)

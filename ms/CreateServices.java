@@ -65,7 +65,7 @@ public class CreateServices extends UnicastRemoteObject implements CreateService
             // Bind this object instance to the name RetrieveServices in the rmiregistry 
             // Naming.rebind("//" + Configuration.getRemoteHost() + ":1099/CreateServices", obj); 
             //initialize logging
-            log = new Log();
+            log = new Log("CreateServices");
             fileWriter = log.createLogWriter();
             //disable logging if the logging initialization failed
             if(fileWriter == null)
